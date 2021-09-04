@@ -45,7 +45,15 @@ CREATE TABLE CuentaAhorro(
 	FOREIGN KEY (TipoCuentaId) REFERENCES TipoCuentaAhorro(Id)
 )
 
-CREATE TABLE 
+CREATE TABLE Parentezco(
+	[Id] [int] PRIMARY KEY,
+	[Nombre] [varchar](40)
+)
+
+CREATE TABLE Beneficiario(
+	
+)
+
 /*
 select * from Persona
 select * from TipoDocuIdentidad
