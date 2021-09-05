@@ -15,9 +15,16 @@ CREATE TABLE Persona(
     FOREIGN KEY (TipoDocuIdentidad) REFERENCES TipoDocuIdentidad(Id)
 )
 
+CREATE TABLE TipoMoneda(
+	[Id] [int] PRIMARY KEY,
+	[Nombre] [varchar](40),
+	[Simbolo] [varchar](1)
+)
+
 CREATE TABLE Moneda(
 	[Id] [int] PRIMARY KEY,
 	[Nombre] [varchar](40)
+	FOREIGN KEY (Id) REFERENCES TipoMoneda(Id)
 )
 
 CREATE TABLE TipoCuentaAhorro(
@@ -32,17 +39,18 @@ CREATE TABLE TipoCuentaAhorro(
 	[ComisionHumano] [int],
 	[ComisionAutomatico] [int],
 	[Interes] [int]
-	FOREIGN KEY (IdTipoMoneda) REFERENCES Moneda(Id)
+	FOREIGN KEY (IdTipoMoneda) REFERENCES TipoMoneda(Id)
 )
 
 CREATE TABLE CuentaAhorro(
-	[Id] [int] PRIMARY KEY,
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[ValorDocumentoIdentidadDelCliente] [varchar](64),
 	[TipoCuentaId] [int],
 	[NumeroCuenta] [int],
 	[FechaCreacion] [date],
 	[Saldo] [int]
-	FOREIGN KEY (TipoCuentaId) REFERENCES TipoCuentaAhorro(Id)
+	FOREIGN KEY (TipoCuentaId) REFERENCES TipoCuentaAhorro(Id),
+	--FOREIGN KEY (ValorDocumentoIdentidadDelCliente) REFERENCES Persona(ValorDocumentoIdentidad) // para conectar persona y cuenta de ahorro (?)
 )
 
 CREATE TABLE Parentezco(
@@ -51,14 +59,34 @@ CREATE TABLE Parentezco(
 )
 
 CREATE TABLE Beneficiario(
-	
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[NumeroCuenta] [int],
+	[ValorDocumentoIdentidadBeneficiario] [int],
+	[ParentezcoId] [int],
+	[Porcentaje] [int]
+	FOREIGN KEY (ParentezcoId) REFERENCES Parentezco(Id)--,
+	--FOREIGN KEY (NumeroCuenta) REFERENCES CuentaAhorro(NumeroCuenta) // para conectar beneficiario y cuenta de ahorro (?)
+)
+
+CREATE TABLE Usuario(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[User] [varchar](40),
+	[Pass] [int],
+	[EsAdministrador] [int]
+)
+
+CREATE TABLE Usuarios_Ver(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[User] [varchar](40),
+	[NumeroCuenta][int],
+	-- FOREIGN KEY (NumeroCuenta) REFERENCES CuentaAhorro(NumeroCuenta) // para conectar usuarios con cuenta ahorro (?)
 )
 
 /*
 select * from Persona
 select * from TipoDocuIdentidad
 drop table TipoDocuIdentidad
-drop table Persona
+
 
 insert into TipoDocuIdentidad
 (Id, Nombre) values ('1', 'Cedula Nacional');
