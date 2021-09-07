@@ -7,11 +7,12 @@ CREATE TABLE Persona(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[TipoDocuIdentidad] [int],
 	[Nombre] [varchar](40),
-	[ValorDocumentoIdentidad] [varchar](64),
+	[ValorDocumentoIdentidad] [int],
 	[FechaNacimiento] [date], 
 	[Email] [varchar](40),
 	[telefono1] [int],
 	[telefono2] [int],
+	UNIQUE(ValorDocumentoIdentidad),
     FOREIGN KEY (TipoDocuIdentidad) REFERENCES TipoDocuIdentidad(Id)
 )
 
@@ -48,9 +49,10 @@ CREATE TABLE CuentaAhorro(
 	[TipoCuentaId] [int],
 	[NumeroCuenta] [int],
 	[FechaCreacion] [date],
-	[Saldo] [int]
+	[Saldo] [int],
+	UNIQUE(NumeroCuenta),
 	FOREIGN KEY (TipoCuentaId) REFERENCES TipoCuentaAhorro(Id),
-	FOREIGN KEY (ValorDocumentoIdentidadDelCliente) REFERENCES Persona(Id) -- para conectar persona y cuenta de ahorro (?)
+	FOREIGN KEY (ValorDocumentoIdentidadDelCliente) REFERENCES Persona(ValorDocumentoIdentidad) -- para conectar persona y cuenta de ahorro
 )
 
 CREATE TABLE Parentezco(
@@ -65,8 +67,8 @@ CREATE TABLE Beneficiario(
 	[ParentezcoId] [int],
 	[Porcentaje] [int],
 	FOREIGN KEY (ParentezcoId) REFERENCES Parentezco(Id),
-	FOREIGN KEY (NumeroCuenta) REFERENCES CuentaAhorro(Id), -- para conectar beneficiario y cuenta de ahorro (?)
-	FOREIGN KEY (ValorDocumentoIdentidadBeneficiario) REFERENCES Persona(Id)
+	FOREIGN KEY (NumeroCuenta) REFERENCES CuentaAhorro(NumeroCuenta), -- para conectar beneficiario y cuenta de ahorro (?)
+	FOREIGN KEY (ValorDocumentoIdentidadBeneficiario) REFERENCES Persona(ValorDocumentoIdentidad)
 )
 
 CREATE TABLE Usuario(
@@ -80,7 +82,7 @@ CREATE TABLE Usuarios_Ver(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[User] [int],
 	[NumeroCuenta][int],
-	FOREIGN KEY (NumeroCuenta) REFERENCES CuentaAhorro(Id), -- para conectar usuarios con cuenta ahorro (?)
+	FOREIGN KEY (NumeroCuenta) REFERENCES CuentaAhorro(NumeroCuenta), -- para conectar usuarios con cuenta ahorro (?)
 	FOREIGN KEY ([User]) REFERENCES Usuario(Id) -- para conectar con usuario
 )
 
