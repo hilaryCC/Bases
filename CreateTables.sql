@@ -45,14 +45,14 @@ CREATE TABLE TipoCuentaAhorro(
 
 CREATE TABLE CuentaAhorro(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
-	[ValorDocumentoIdentidadDelCliente] [int],
+	[IdPersona] [int],
 	[TipoCuentaId] [int],
 	[NumeroCuenta] [int],
 	[FechaCreacion] [date],
 	[Saldo] [int],
 	UNIQUE(NumeroCuenta),
 	FOREIGN KEY (TipoCuentaId) REFERENCES TipoCuentaAhorro(Id),
-	FOREIGN KEY (ValorDocumentoIdentidadDelCliente) REFERENCES Persona(ValorDocumentoIdentidad) 
+	FOREIGN KEY (IdPersona) REFERENCES Persona(Id) 
 )
 
 CREATE TABLE Parentezco(
@@ -62,13 +62,13 @@ CREATE TABLE Parentezco(
 
 CREATE TABLE Beneficiario(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
-	[NumeroCuenta] [int],
-	[ValorDocumentoIdentidadBeneficiario] [int],
+	[IdCuenta] [int],
+	[IdPersona] [int],
 	[ParentezcoId] [int],
 	[Porcentaje] [int],
 	FOREIGN KEY (ParentezcoId) REFERENCES Parentezco(Id),
-	FOREIGN KEY (NumeroCuenta) REFERENCES CuentaAhorro(NumeroCuenta), 
-	FOREIGN KEY (ValorDocumentoIdentidadBeneficiario) REFERENCES Persona(ValorDocumentoIdentidad)
+	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id), 
+	FOREIGN KEY (IdPersona) REFERENCES Persona(Id)
 )
 
 CREATE TABLE Usuario(
@@ -80,10 +80,10 @@ CREATE TABLE Usuario(
 
 CREATE TABLE Usuarios_Ver(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
-	[User] [int],
-	[NumeroCuenta][int],
-	FOREIGN KEY (NumeroCuenta) REFERENCES CuentaAhorro(NumeroCuenta), 
-	FOREIGN KEY ([User]) REFERENCES Usuario(Id) 
+	[IdUser] [int],
+	[IdCuenta][int],
+	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id), 
+	FOREIGN KEY (IdUser) REFERENCES Usuario(Id)
 )
 
 /*
