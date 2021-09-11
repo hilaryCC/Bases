@@ -1,3 +1,40 @@
+USE PXml -- Nombre de la base de datos a usar
+GO
+-- En caso de que las tablas ya existan se eliminan --
+------------------------------------------------------
+IF OBJECT_ID('Beneficiario') IS NOT NULL
+	DROP TABLE Beneficiario;
+
+IF OBJECT_ID('Parentezco') IS NOT NULL
+	DROP TABLE Parentezco;
+
+IF OBJECT_ID('Usuarios_Ver') IS NOT NULL
+	DROP TABLE Usuarios_Ver;
+
+IF OBJECT_ID('Usuario') IS NOT NULL
+	DROP TABLE Usuario;
+
+IF OBJECT_ID('CuentaAhorro') IS NOT NULL
+	DROP TABLE CuentaAhorro;
+
+IF OBJECT_ID('Persona') IS NOT NULL
+	DROP TABLE Persona;
+
+IF OBJECT_ID('TipoCuentaAhorro') IS NOT NULL
+	DROP TABLE TipoCuentaAhorro;
+
+IF OBJECT_ID('TipoDocuIdentidad') IS NOT NULL
+	DROP TABLE TipoDocuIdentidad;
+
+IF OBJECT_ID('Moneda') IS NOT NULL
+	DROP TABLE Moneda;
+
+IF OBJECT_ID('TipoMoneda') IS NOT NULL
+	DROP TABLE TipoMoneda;
+------------------------------------------------------
+------------------------------------------------------
+-- Creacion de tablas --
+
 CREATE TABLE TipoDocuIdentidad(
 	[Id] [int] PRIMARY KEY,
 	[Nombre] [varchar] (40)
@@ -32,8 +69,8 @@ CREATE TABLE TipoCuentaAhorro(
 	[Id] [int] PRIMARY KEY,
 	[Nombre] [varchar](40),
 	[IdTipoMoneda] [int],
-	[SaldoMinimo] [int], 
-	[MultaSaldoMin] [int],
+	[SaldoMinimo] [float], 
+	[MultaSaldoMin] [float],
 	[CargoAnual] [int], 
 	[NumRetirosHumano] [int], 
 	[NumRetirosAutomatico] [int], 
@@ -49,7 +86,7 @@ CREATE TABLE CuentaAhorro(
 	[TipoCuentaId] [int],
 	[NumeroCuenta] [int],
 	[FechaCreacion] [date],
-	[Saldo] [int],
+	[Saldo] [float],
 	UNIQUE(NumeroCuenta),
 	FOREIGN KEY (TipoCuentaId) REFERENCES TipoCuentaAhorro(Id),
 	FOREIGN KEY (IdPersona) REFERENCES Persona(Id) 
@@ -74,8 +111,10 @@ CREATE TABLE Beneficiario(
 CREATE TABLE Usuario(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[User] [varchar](40),
-	[Pass] [int],
+	[Pass] [varchar](40),
+	[IdPersona] [int],
 	[EsAdministrador] [int]
+	FOREIGN KEY (IdPersona) REFERENCES Persona(Id)
 )
 
 CREATE TABLE Usuarios_Ver(
