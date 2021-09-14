@@ -1,36 +1,37 @@
-<!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="Generator" content="Docukits">
         <title>Beneficiarios</title>
         <!-- CSS -->
         <style>
             /* Estilo para la barra de navegacion */
             body {
-              margin: 0;
-              font-family: Arial, Helvetica, sans-serif;
+                margin: 0;
+                font-family: Arial, Helvetica, sans-serif;
             }
 
             .navbar {
-              overflow: hidden;
-              background-color: #333;
+                overflow: hidden;
+                background-color: #333;
             }
 
             .navbar a {
-              float: left;
-              color: #f2f2f2;
-              padding: 14px 16px;
-              text-decoration: none;
-              font-size: 17px;
+                float: left;
+                color: #f2f2f2;
+                padding: 14px 16px;
+                text-decoration: none;
+                font-size: 17px;
             }
 
             .navbar a:hover {
-              background-color: #ddd;
-              color: black;
+                background-color: #ddd;
+                color: black;
             }
 
             .navbar a.seleccionada {
-              background-color: #aa6aff;
-              color: white;
+                background-color: #aa6aff;
+                color: white;
             }
             /* Estilo para botones y texto */
             .boton {
@@ -49,24 +50,26 @@
             }
 
             .titulo {
-              padding-top: 40px;
-              color: #8C55AA;
-              font-family: 'Ubuntu', sans-serif;
-              font-weight: bold;
-              font-size: 23px;
+                padding-top: 40px;
+                color: #8C55AA;
+                font-family: 'Ubuntu', sans-serif;
+                font-weight: bold;
+                font-size: 23px;
+            }
+            table, td {
+                border: 1px solid black;
             }
         </style>
         <!-- JAVASCRIPT-->
         <script>
-          function detInfo() {
-            var editarOpcion = document.getElementById("EditOp").value; // variable que guarda la opcion de lo que se va a editar
-            var numBeneficiario = document.getElementById("quantity").value;
-            //document.getElementById("demo").innerHTML = numBeneficiario; para ver la opcion escogida de algo
-            alert("Informacion enviada");
-          }
+            function detInfo() {
+                var editarOpcion = document.getElementById("EditOp").value; // variable que guarda la opcion de lo que se va a editar
+                var numBeneficiario = document.getElementById("quantity").value;
+                //document.getElementById("demo").innerHTML = numBeneficiario; para ver la opcion escogida de algo
+                alert("Informacion enviada");
+            }
         </script>
     </head>
-
 
     <body>
       
@@ -77,15 +80,60 @@
 
     <div style="padding-left:16px">
         <br><br>
+        <!-- MOSTRAR TABLA BENEFICIARIOS-->
         <label class="titulo">Beneficiarios</label>
-        <p>*tabla con beneficiarios*</p>
+        <br><br>
+        <%
+            Dim con 'variable para objeto de conexion
+            Dim rec 'variable para objeto recordset
+            Dim rs 'variable para guardar el puntero
+            Dim x 'contador
+
+            ' Se crea el objeto de conexion
+            Set con = Server.CreateObject("Adodb.Connection")
+
+            ' Se crea el objeto recordset
+            Set rec = Server.CreateObject("Adodb.recordset")
+
+            ' Se abre la conexion
+            con.open "Proyecto1" ' nombre del DSN creado
+
+            Set rs = con.execute("Select * from Beneficiario")
+        %>
+        <table>
+            <tr bgcolor="grey" width="700">
+                <th>Nombre</th>
+                <th>Identificacion</th>
+                <th>Fecha Nacimiento</th>
+                <th>Telefono 1</th>
+                <th>Telefono 2</th>
+                <th>Porcentaje</th>
+                <th>Parentezco</th>
+            </tr>
+            <%
+                Set rs = con.execute("SELECT * FROM dbo.Persona P FULL OUTER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona where B.Porcentaje is not null")
+                Do Until rs.EOF 'EOF = end of file
+                    Response.Write("<tr bgcolor='lightgrey' align='center'>")
+                        For Each x In rs.Fields
+                            If (x.name = "Nombre") Or (x.name = "ValorDocumentoIdentidad") Or _
+                               (x.name = "FechaNacimiento") Or (x.name = "telefono1") Or _
+                               (x.name = "telefono2") Or (x.name = "ParentezcoId") Or (x.name = "Porcentaje") then
+                                Response.Write("<td>" & x.value & "</td>")
+                            End If
+                        Next
+                    Response.Write("</tr>")
+                    rs.movenext
+                Loop
+            %>
+        </table>
+        <!-- EDITAR BENEFICIARIOS -->
         <br><br><br><hr><br>
         <label class="titulo">Editar Beneficiarios</label>
         <br><br>
         <label for="numBen">Digite el numero del beneficiario que desea editar: </label>
-        <input type="number" id="quantity" name="quantity" min ="0" max="3">
+        <input type="number" id="quantity" name="quantity" min="0" max="3">
         <br><br>
-        
+
         <label for="optionlbl">Escoja lo que va a editar:</label>
         <select id="EditOp">
             <option value="nombre">Nombre</option>
@@ -96,7 +144,7 @@
             <option value="telefono2">Telefono 2</option>
         </select>
         <br><br>
-        
+
         <label for="lbl2">Digite la nueva información según lo escogido: </label>
         <input class="textbox" type="text" id="Infotxt" ame="Infotxt" placeholder="Nuevo nombre o etc">
         <br><br>
@@ -104,6 +152,7 @@
         <!--  <p id="demo"></p> para ver la opcion escogida en un label-->
         <br><br><br><hr><br>
 
+        <!-- AGREGAR BENEFICIARIOS -->
         <label class="titulo">Agregar Beneficiarios</label>
         <br><br>
         <label for="optionlbl">Digite la siguiente información:</label>
@@ -120,22 +169,22 @@
         <input class="textbox" type="text" id="Porcentaje" ame="Porcentaje" placeholder="Porcentaje">
         <input class="textbox" type="text" id="TipoDocuIdentidad" ame="TipoDocuIdentidad" placeholder="Tipo Documento Identidad">
         <br><br>
-        <label for="optionlbl" >Fecha Nacimiento:</label>
+        <label for="optionlbl">Fecha Nacimiento:</label>
         <input type="date" id="FechaNacimiento" name="FechaNacimiento" placeholder="Fecha Nacimiento">
         <br><br>
         <button id="aceptarAgregar" class="boton" type="button">Aceptar</button>
         <br><br><br><hr><br>
-        
+
+        <!-- ELIMINAR BENEFICIARIOS -->
         <label class="titulo">Eliminar Beneficiarios</label>
         <br><br>
         <label for="numBen">Digite el numero del beneficiario que desea eliminar: </label>
-        <input type="number" id="quantity" name="quantity" min ="0" max="3">
+        <input type="number" id="quantity" name="quantity" min="0" max="3">
         <br><br>
         <button id="aceptarEliminar" class="boton" type="button">Aceptar</button>
         <br><br><br><br>
-      </div>
 
-    
 
+    </div>
     </body>
 </html>
