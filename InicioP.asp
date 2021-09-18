@@ -69,6 +69,7 @@
         Dim rs 'variable para guardar el puntero
         Dim x 'contador
 
+
         ' Se crea el objeto de conexion
         Set con = Server.CreateObject("Adodb.Connection")
 
@@ -76,7 +77,7 @@
         Set rec = Server.CreateObject("Adodb.recordset")
 
         ' Se abre la conexion
-        con.open "Proyecto1" ' nombre del DSN creado
+        con.open "BasesD" ' nombre del DSN creado
 
         Set rs = con.execute("Select * from Beneficiario")
 
@@ -84,7 +85,7 @@
         Set rs = con.Execute("Select * from Usuario")
         DO UNTIL rs.EOF 
             FOR EACH x IN rs.Fields
-                IF(x.name = "Usuario") AND (x.value = Session("nombreUsuario")) THEN
+                IF (x.name = "User") AND (x.value = Session("nombreUsuario")) THEN
                     Session("IdPersona") = rs("IdPersona").value
                     Session("EsAdministrador") = rs("EsAdministrador").value
                 END IF
@@ -97,9 +98,7 @@
     <div style='padding-left:16px'>
         <table>
             <tr bgcolor="grey" width="700">
-                <th>ID</th>
-                <th>ID Persona</th>
-                <th>ID Tipo Cuenta</th>
+                <th>Tipo Cuenta</th>
                 <th>Numero Cuenta</th>
                 <th>Fecha Creacion</th>
                 <th>Saldo</th>
@@ -120,13 +119,11 @@
                     LOOP
                 ELSE
                     'Mostrar solo las de usuario
-                    Set rs = con.execute("SELECT * FROM CuentaAhorro")
+                    Set rs = con.execute("SELECT T.Nombre, C.NumeroCuenta, C.FechaCreacion, C.Saldo FROM CuentaAhorro C INNER JOIN Usuarios_Ver U ON U.IdCuenta=C.Id INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id WHERE U.Id="&Session("IdUsuario"))
                     DO UNTIL rs.EOF
                         Response.Write("<tr bgcolor='lightgrey' align='center'>")
                             FOR EACH x IN rs.Fields
-                                IF (rs("IdPersona").value = Session("IdPersona")) THEN
                                     Response.Write("<td>" & x.value & "</td>")
-                                END IF
                             NEXT
                         Response.Write("</tr>")
                         rs.movenext
@@ -140,7 +137,6 @@
         <input class="boton" type="submit" value="Aceptar">  
     </form>
     <%
-        
         Session("existeCuenta") = "0"
         Session.Timeout = 60
         'Validar que exista el ID Cuenta

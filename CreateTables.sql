@@ -103,6 +103,8 @@ CREATE TABLE Beneficiario(
 	[IdPersona] [int],
 	[ParentezcoId] [int],
 	[Porcentaje] [int],
+	[Activo] [bit], --BIT se usa como un booleano (1 True, 0 False)
+	[FechaDesactivacion] [date],
 	FOREIGN KEY (ParentezcoId) REFERENCES Parentezco(Id),
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id), 
 	FOREIGN KEY (IdPersona) REFERENCES Persona(Id)
@@ -124,22 +126,3 @@ CREATE TABLE Usuarios_Ver(
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id), 
 	FOREIGN KEY (IdUser) REFERENCES Usuario(Id)
 )
-
-/*
-select * from Persona
-select * from TipoDocuIdentidad
-drop table TipoDocuIdentidad
-
-
-insert into TipoDocuIdentidad
-(Id, Nombre) values ('1', 'Cedula Nacional');
-insert into TipoDocuIdentidad
-(Id, Nombre) values ('2', 'Cedula Residente');
-insert into [dbo].[Persona] 
-
-(Nombre, Email, telefono1, TipoDocuIdentidad) values ('Valeria', 'vchinchilla02@hotmail.com', 64596768, 2);
-insert into [dbo].[Persona] 
-(Nombre, Email, telefono1, TipoDocuIdentidad) values ('Valeria2', 'vchinchilla02@hotmail.com', 64596768, 2);
-insert into [dbo].[Persona] 
-(Nombre, Email, telefono1, TipoDocuIdentidad) values ('Valeria3', 'vchinchilla02@hotmail.com', 64596768, 2);
-*/

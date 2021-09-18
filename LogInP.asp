@@ -99,14 +99,14 @@
                     Set rec = Server.CreateObject("Adodb.recordset")
 
                     ' Se abre la conexion
-                    con.open "Proyecto1" ' nombre del DSN creado
+                    con.open "BasesD" ' nombre del DSN creado
                     
-                    Set rs = con.execute("Select [Usuario].[Usuario] from Usuario")
+                    Set rs = con.execute("Select [User] from Usuario")
 
                     'Validar usuario
                     DO UNTIL rs.EOF 'EOF = end of file
                         FOR EACH x IN rs.Fields
-                            IF(x.value = request.form("usuario")) THEN
+                            IF (x.value = request.form("usuario")) THEN
                                 Session("existeU") = "1"
                                 Session("nombreUsuario") = request.form("usuario")
                             END IF
@@ -114,12 +114,16 @@
                         rs.movenext
                     LOOP
                     
+                    IF (Session("nombreUsuario")<>"") THEN
+                        rec.open("SELECT Id FROM Usuario WHERE [User]='"&Session("nombreUsuario")&"'"), con
+                        Session("IdUsuario") = CInt(rec.GetString())
+                    END IF
                     Set rs = con.execute("Select Pass from Usuario")
 
                     'Validar contraseña 
                     DO UNTIL rs.EOF 'EOF = end of file
                         FOR EACH x IN rs.Fields
-                            IF(x.value = request.form("contrasena")) THEN
+                            IF (x.value = request.form("contrasena")) THEN
                                 Session("existeC") = "1"
                             END IF
                         NEXT
@@ -127,7 +131,7 @@
                     LOOP
                     
                     ' Determinar si puede entrar
-                    IF(Session("existeU") = "1") AND (Session("existeC") = "1") THEN
+                    IF (Session("existeU") = "1") AND (Session("existeC") = "1") THEN
                         Response.Redirect("InicioP.asp")
                     END IF
                 %>
