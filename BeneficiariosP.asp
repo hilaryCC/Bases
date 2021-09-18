@@ -68,13 +68,14 @@
                 //document.getElementById("demo").innerHTML = numBeneficiario; para ver la opcion escogida de algo
                 alert("Informacion enviada");
             }
+
         </script>
     </head>
 
     <body>
       
     <div class="navbar">
-      <a href="InicioP.html">Inicio</a>
+      <a href="InicioP.asp">Inicio</a>
       <a class="seleccionada" href="#beneficiarios">Beneficiarios</a>
     </div>
 
@@ -107,25 +108,43 @@
                 <th>Fecha Nacimiento</th>
                 <th>Telefono 1</th>
                 <th>Telefono 2</th>
-                <th>Porcentaje</th>
                 <th>Parentezco</th>
+                <th>Porcentaje</th>
             </tr>
             <%
-                Set rs = con.execute("SELECT * FROM dbo.Persona P FULL OUTER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona where B.Porcentaje is not null")
-                Do Until rs.EOF 'EOF = end of file
+                ' Determinar el id de la cuenta
+                Set rs = con.execute("SELECT * FROM CuentaAhorro")
+        
+                DO UNTIL rs.EOF 
+                    FOR EACH x IN rs.Fields
+                        IF (CStr(x.value) = CStr(Session("NumeroCuenta")) ) THEN
+                            Session("IdCuenta") = rs("Id").value
+                        END IF
+                    NEXT
+                    rs.movenext
+                LOOP
+                
+
+                ' Mostrar tabla de beneficiarios
+                Set rs = con.execute("SELECT * FROM dbo.Persona P FULL OUTER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona where B.IdCuenta is not null")
+                DO UNTIL rs.EOF 'EOF = end of file
                     Response.Write("<tr bgcolor='lightgrey' align='center'>")
-                        For Each x In rs.Fields
-                            If (x.name = "Nombre") Or (x.name = "ValorDocumentoIdentidad") Or _
+                        FOR EACH x IN rs.Fields
+                            IF (x.name = "Nombre") Or (x.name = "ValorDocumentoIdentidad") Or _
                                (x.name = "FechaNacimiento") Or (x.name = "telefono1") Or _
-                               (x.name = "telefono2") Or (x.name = "ParentezcoId") Or (x.name = "Porcentaje") then
-                                Response.Write("<td>" & x.value & "</td>")
-                            End If
-                        Next
+                               (x.name = "telefono2") Or (x.name = "ParentezcoId") Or _
+                               (x.name = "Porcentaje") THEN
+                                IF (rs("IdCuenta").value = Session("IdCuenta")) then
+                                    Response.Write("<td>" & x.value & "</td>")
+                                END IF
+                            END IF
+                        NEXT
                     Response.Write("</tr>")
                     rs.movenext
-                Loop
+                LOOP
             %>
         </table>
+        
         <!-- EDITAR BENEFICIARIOS -->
         <br><br><br><hr><br>
         <label class="titulo">Editar Beneficiarios</label>
