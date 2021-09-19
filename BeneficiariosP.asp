@@ -99,6 +99,7 @@
             Dim rsql 'Variable para guardar el comando sql'
             Dim infot 'Guarda el string de la tabla'
             Dim x 'contador
+            Dim viene 'verificar si el formulario se envio'
 
             ' Se crea el objeto de conexion
             Set con = Server.CreateObject("Adodb.Connection")
@@ -132,7 +133,7 @@
             
             rec.open(rsql), con
           IF  not rec.EOF THEN
-              infot=rec.GetString(,,"</td><td>","</td></tr><tr><td>"," ")
+              infot=rec.GetString(,,"</td><td>","</td><tr bgcolor='lightgrey' align='center'><td>"," ")
 
               %>
               <tr>
@@ -166,9 +167,6 @@
 
           <%END IF
   					rec.close
-  					con.close
-  					set rec=nothing
-  					set con=nothing
           ELSE%>
             <br>
               <div class="alert">
@@ -182,7 +180,7 @@
 
         <!-- EDITAR BENEFICIARIOS -->
         <br><hr><br>
-        <form action="Editar.asp" method="post">
+        <form action="BeneficiariosP.asp" method="post">
           <label class="titulo">Editar Beneficiarios</label>
           <br><br>
           <label for="numBen">Digite el Id del beneficiario que desea editar: </label>
@@ -208,6 +206,28 @@
           <button id="aceptarEdit" class="boton" type="submit">Aceptar</button>
       </form>
 
+      <!-- VERIFICAR EL BENEFICIARIO -->
+      <%
+        viene=Request.Form("Infotxt")
+        IF (viene<>"") THEN
+          rec.open("SELECT Id FROM Beneficiario WHERE Id="&Request.Form("quantity")&" AND Activo=1 AND IdCuenta="&Session("IdCuenta")), con
+          IF rec.EOF THEN%>
+            <br>
+            <div class="alert">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>Alerta!</strong> El Id del beneficiario no existe asociado a su cuenta.
+              </div>
+          <%ELSE%>
+            <form id="AVBene" name="AVBene" action="Editar.asp" method="post" style="display:block">
+              <input type="hidden" id="opcionB" name="opcionB" value="<%Response.write(Request.form("EditOp"))%>">
+              <input type="hidden" id="nuevoB" name="nuevoB" value="<%Response.write(Request.form("Infotxt"))%>">
+              <input type="hidden" id="idB" name="idB" value="<%Response.write(Request.form("quantity"))%>">
+            </form>
+            <script>document.getElementById("AVBene").submit()</script>
+          <%END IF
+        END IF
+      %>
+
       <br><br><hr><br>
 
       <!-- AGREGAR BENEFICIARIOS -->
@@ -229,17 +249,37 @@
       </form>
       <br><br><br><hr><br>
 
+      <!-- Eliminar BENEFICIARIOS -->
+      <form action="BeneficiariosP.asp" method="post">
         <label class="titulo">Eliminar Beneficiarios</label>
         <br><br>
         <label for="numBen">Digite el Id del beneficiario que desea eliminar: </label>
-        <input type="number" id="quantity" name="quantity" min ="0" max="3">
+        <input type="number" id="quantity" name="beneficiario">
         <br><br>
         <!--Boton eliminar beneficiarios-->
-        <button id="aceptarEliminar" class="boton" type="button">Aceptar</button>
-        <br><br><br><br>
+        <button id="aceptarEliminar" class="boton" type="submit">Aceptar</button>
+        <br>
+      </form>
+      <!-- VERIFICAR EL BENEFICIARIO -->
+      <%Dim viene1
+        viene1=Request.Form("beneficiario")
+        IF (viene1<>"") THEN
+          rec.open("SELECT Id FROM Beneficiario WHERE Id="&Request.Form("beneficiario")&" AND Activo=1 AND IdCuenta="&Session("IdCuenta")), con
+          IF rec.EOF THEN%>
+            <br>
+            <div class="alert">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>Alerta!</strong> El Id del beneficiario no existe asociado a su cuenta.
+              </div>
+          <%ELSE%>
+            <form id="ELBene" name="ELBene" action="Eliminar.asp" method="post" style="display:block">
+              <input type="hidden" id="eliminarB" name="eliminarB" value="<%Response.write(Request.form("beneficiario"))%>">
+            </form>
+            <script>document.getElementById("ELBene").submit()</script>
+          <%END IF
+        END IF
+      %>
+      <br><br><br><br>
       </div>
-
-
-
     </body>
 </html>

@@ -58,6 +58,27 @@
                 margin-left: 35%;
                 font-size: 13px;
             }
+
+            .alert {
+              padding: 10px;
+              background-color: #f44336;
+              color: white;
+            }
+
+            .closebtn {
+              margin-left: 15px;
+              color: white;
+              font-weight: bold;
+              float: right;
+              font-size: 22px;
+              line-height: 20px;
+              cursor: pointer;
+              transition: 0.3s;
+            }
+
+            .closebtn:hover {
+              color: black;
+            }
         </style>
     </head>
     <body>
@@ -88,51 +109,71 @@
                     Dim rec 'variable para objeto recordset
                     Dim rs 'variable para guardar el puntero
                     Dim x 'contador
+                    Dim viene 'si el formulario ya fue enviado'
                     Session("existeU") = "0" ' para determinar si el usuario existe
                     Session("existeC") = "0"' para determinar si la contraseña es correcta
                     Session.Timeout = 60
-                    
-                    ' Se crea el objeto de conexion
-                    Set con = Server.CreateObject("Adodb.Connection")
 
-                    ' Se crea el objeto recordset
-                    Set rec = Server.CreateObject("Adodb.recordset")
-
-                    ' Se abre la conexion
-                    con.open "BasesD" ' nombre del DSN creado
+                    viene = request.form("usuario")
+                    If (viene<>"") THEN
                     
-                    Set rs = con.execute("Select [User] from Usuario")
+                        ' Se crea el objeto de conexion
+                        Set con = Server.CreateObject("Adodb.Connection")
 
-                    'Validar usuario
-                    DO UNTIL rs.EOF 'EOF = end of file
-                        FOR EACH x IN rs.Fields
-                            IF (x.value = request.form("usuario")) THEN
-                                Session("existeU") = "1"
-                                Session("nombreUsuario") = request.form("usuario")
-                            END IF
-                        NEXT
-                        rs.movenext
-                    LOOP
-                    
-                    IF (Session("nombreUsuario")<>"") THEN
-                        rec.open("SELECT Id FROM Usuario WHERE [User]='"&Session("nombreUsuario")&"'"), con
-                        Session("IdUsuario") = CInt(rec.GetString())
-                    END IF
-                    Set rs = con.execute("Select Pass from Usuario")
+                        ' Se crea el objeto recordset
+                        Set rec = Server.CreateObject("Adodb.recordset")
 
-                    'Validar contraseña 
-                    DO UNTIL rs.EOF 'EOF = end of file
-                        FOR EACH x IN rs.Fields
-                            IF (x.value = request.form("contrasena")) THEN
-                                Session("existeC") = "1"
-                            END IF
-                        NEXT
-                        rs.movenext
-                    LOOP
-                    
-                    ' Determinar si puede entrar
-                    IF (Session("existeU") = "1") AND (Session("existeC") = "1") THEN
-                        Response.Redirect("InicioP.asp")
+                        ' Se abre la conexion
+                        con.open "BasesD" ' nombre del DSN creado
+                        
+                        Set rs = con.execute("Select [User] from Usuario")
+
+                        'Validar usuario
+                        DO UNTIL rs.EOF 'EOF = end of file
+                            FOR EACH x IN rs.Fields
+                                IF (x.value = request.form("usuario")) THEN
+                                    Session("existeU") = "1"
+                                    Session("nombreUsuario") = request.form("usuario")
+                                END IF
+                            NEXT
+                            rs.movenext
+                        LOOP
+                        
+                        IF (Session("existeU")<>"0") THEN
+                            rec.open("SELECT Id FROM Usuario WHERE [User]='"&Session("nombreUsuario")&"'"), con
+                            Session("IdUsuario") = CInt(rec.GetString())
+
+                            Set rs = con.execute("Select Pass from Usuario WHERE [User]='"&Session("nombreUsuario")&"'")
+
+                            'Validar contraseña 
+                            DO UNTIL rs.EOF 'EOF = end of file
+                                FOR EACH x IN rs.Fields
+                                    IF (x.value = request.form("contrasena")) THEN
+                                        Session("existeC") = "1"
+                                    END IF
+                                NEXT
+                                rs.movenext
+                            LOOP
+                            
+                            ' Determinar si puede entrar
+                            IF (Session("existeU") = "1") AND (Session("existeC") = "1") THEN
+                                Response.Redirect("InicioP.asp")
+                            ELSE%>
+                                <br>
+                                <div class="alert">
+                                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                                <strong>Error!</strong> Contraseña incorrecta.
+                              </div>
+                            <%END IF
+                        ELSE 
+                            %>
+                                <br>
+                                <div class="alert">
+                                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                                <strong>Error!</strong> El usuario no existe.
+                              </div>
+                            <%
+                        END IF
                     END IF
                 %>
 

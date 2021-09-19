@@ -17,9 +17,9 @@
     con.open "BasesD"
 
     'Collect data'
-    opcion=Request.Form("EditOp")
-    nuevo=Request.Form("Infotxt")
-    idBen= CInt(Request.Form("quantity"))
+    opcion=Request.Form("opcionB")
+    nuevo=Request.Form("nuevoB")
+    idBen= CInt(Request.Form("idB"))
 
     'Ejecutar un comando SQL'
     IF (opcion="nombre") THEN
