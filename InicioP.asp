@@ -108,7 +108,7 @@
                 ' o solo las del usuario
                 IF (Session("EsAdministrador") = "1") THEN
                     'Mostrar todas las cuentas
-                    Set rs = con.execute("SELECT * FROM CuentaAhorro")
+                    Set rs = con.execute("SELECT T.Nombre, C.NumeroCuenta, C.FechaCreacion, C.Saldo FROM CuentaAhorro C INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id")
                     DO UNTIL rs.EOF
                         Response.Write("<tr bgcolor='lightgrey' align='center'>")
                             FOR EACH x IN rs.Fields
@@ -153,6 +153,8 @@
         LOOP
         
         IF (Session("existeCuenta") = "1") THEN
+            rec.open("SELECT Id FROM CuentaAhorro WHERE NumeroCuenta="&Session("NumeroCuenta")), con
+            Session("IdCuenta") = CInt(rec.GetString())
             Response.Redirect("BeneficiariosP.asp")
         END IF
     %>

@@ -123,17 +123,13 @@
                 <th>Porcentaje</th>
             </tr>
             <%
-                ' Determinar el id de la cuenta
-                rec.open("SELECT IdCuenta FROM Usuarios_Ver U WHERE U.IdUser="&Session("IdUsuario")),con
-                Session("IdCuenta") = CInt(rec.GetString())
 
                 ' Mostrar tabla de beneficiarios
                 rsql="SELECT B.Id, P.Nombre, P.ValorDocumentoIdentidad, P.FechaNacimiento, P.telefono1, P.telefono2, Pa.Nombre, B.Porcentaje"
                 rsql=rsql+" FROM dbo.Persona P INNER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona"
                 rsql=rsql+" INNER JOIN dbo.Parentezco Pa ON B.ParentezcoId=Pa.Id where B.IdCuenta="&Session("IdCuenta")
                 rsql=rsql+" AND B.Activo=1"
-
-                rec.close
+                
                 rec.open(rsql), con
                 infot=rec.GetString(,,"</td><td>","</td></tr><tr><td>"," ")
 
