@@ -112,63 +112,72 @@
             Set rs = con.execute("Select * from Beneficiario")
         %>
         <table>
-            <tr bgcolor="grey" width="700">
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>Identificacion</th>
-                <th>Fecha Nacimiento</th>
-                <th>Telefono 1</th>
-                <th>Telefono 2</th>
-                <th>Parentezco</th>
-                <th>Porcentaje</th>
-            </tr>
-            <%
+          <tr bgcolor="grey" width="700">
+              <th>Id</th>
+              <th>Nombre</th>
+              <th>Identificacion</th>
+              <th>Fecha Nacimiento</th>
+              <th>Telefono 1</th>
+              <th>Telefono 2</th>
+              <th>Parentezco</th>
+              <th>Porcentaje</th>
+          </tr>
+          <%
 
-                ' Mostrar tabla de beneficiarios
-                rsql="SELECT B.Id, P.Nombre, P.ValorDocumentoIdentidad, P.FechaNacimiento, P.telefono1, P.telefono2, Pa.Nombre, B.Porcentaje"
-                rsql=rsql+" FROM dbo.Persona P INNER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona"
-                rsql=rsql+" INNER JOIN dbo.Parentezco Pa ON B.ParentezcoId=Pa.Id where B.IdCuenta="&Session("IdCuenta")
-                rsql=rsql+" AND B.Activo=1"
-                
-                rec.open(rsql), con
-                infot=rec.GetString(,,"</td><td>","</td></tr><tr><td>"," ")
+            ' Mostrar tabla de beneficiarios
+            rsql="SELECT B.Id, P.Nombre, P.ValorDocumentoIdentidad, P.FechaNacimiento, P.telefono1, P.telefono2, Pa.Nombre, B.Porcentaje"
+            rsql=rsql+" FROM dbo.Persona P INNER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona"
+            rsql=rsql+" INNER JOIN dbo.Parentezco Pa ON B.ParentezcoId=Pa.Id where B.IdCuenta="&Session("IdCuenta")
+            rsql=rsql+" AND B.Activo=1"
+            
+            rec.open(rsql), con
+          IF  not rec.EOF THEN
+              infot=rec.GetString(,,"</td><td>","</td></tr><tr><td>"," ")
 
-            %>
-            <tr>
-              <%Response.Write("<tr bgcolor='lightgrey' align='center'>")%>
-             <td><%Response.Write(infot)%></td>
-           </tr>
-        </table>
+              %>
+              <tr>
+                <%Response.Write("<tr bgcolor='lightgrey' align='center'>")%>
+               <td><%Response.Write(infot)%></td>
+             </tr>
+          </table>
 
-				<%
-          rec.close
-					rec.open("SELECT SUM(porcentaje) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")), con
-					suma = CInt(rec.GetString())
-          rec.close
-					rec.open("SELECT COUNT(*) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")), con
-					cant = CInt(rec.GetString())
+  				<%
+            rec.close
+  					rec.open("SELECT SUM(porcentaje) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")), con
+  					suma = CInt(rec.GetString())
+            rec.close
+  					rec.open("SELECT COUNT(*) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")), con
+  					cant = CInt(rec.GetString())
 
-          IF (suma<>100)THEN%>
+            IF (suma<>100)THEN%>
+              <br>
+    					<div class="alert">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>Alerta!</strong> La suma de los porcentajes no da 100.
+              </div>
+
+          <%END IF 
+            IF (cant<>3) THEN%>
+              <br>
+              <div class="alert">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>Alerta!</strong> La cantidad de beneficiarios es incorrecta.
+              </div>
+
+          <%END IF
+  					rec.close
+  					con.close
+  					set rec=nothing
+  					set con=nothing
+          ELSE%>
             <br>
-  					<div class="alert">
-              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-              <strong>Alerta!</strong> La suma de los porcentajes no da 100.
-            </div>
+              <div class="alert">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>Alerta!</strong> No existen beneficiarios
+              </div>
+          <%END IF
 
-        <%END IF 
-          IF (cant<>3) THEN%>
-            <br>
-            <div class="alert">
-              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-              <strong>Alerta!</strong> La cantidad de beneficiarios es incorrecta.
-            </div>
-
-        <%END IF
-					rec.close
-					con.close
-					set rec=nothing
-					set con=nothing
-				%>
+        %>
 			</div>
 
         <!-- EDITAR BENEFICIARIOS -->
@@ -177,7 +186,7 @@
           <label class="titulo">Editar Beneficiarios</label>
           <br><br>
           <label for="numBen">Digite el Id del beneficiario que desea editar: </label>
-          <input type="number" id="quantity" name="quantity" min ="0" max="3">
+          <input type="number" id="quantity" name="quantity">
           <br><br>
 
           <label for="optionlbl">Escoja lo que va a editar:</label>
@@ -201,13 +210,20 @@
 
       <br><br><hr><br>
 
+      <!-- AGREGAR BENEFICIARIOS -->
       <form action="Agregar.asp" method="post">
         <label class="titulo">Agregar Beneficiarios</label>
         <br><br>
         <label for="optionlbl">Digite la siguiente información:</label>
         <br><br>
-        <input class="textbox" type="text" id="ValorDocumentoIdentidad" name="ValorDocumentoIdentidad" placeholder="Identificación">
+        <input class="textbox" type="text" name="ValorDocumentoIdentidad" placeholder="Identificación">
         <br><br>
+        <input class="textbox" type="text" name="parentezco" placeholder="Parentezco">
+        <br><br> 
+        <label for="numBen">Porcentaje: </label>
+        <input type="number" name="porcentaje" min="1" max="100">
+        <br><br>
+
         <!--Boton agregar beneficiarios-->
         <button id="aceptarAgregar" class="boton" type="submit">Aceptar</button>
       </form>

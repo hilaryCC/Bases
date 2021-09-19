@@ -98,6 +98,7 @@
     <div style='padding-left:16px'>
         <table>
             <tr bgcolor="grey" width="700">
+                <th>Id Cuenta</th>
                 <th>Tipo Cuenta</th>
                 <th>Numero Cuenta</th>
                 <th>Fecha Creacion</th>
@@ -108,7 +109,7 @@
                 ' o solo las del usuario
                 IF (Session("EsAdministrador") = "1") THEN
                     'Mostrar todas las cuentas
-                    Set rs = con.execute("SELECT T.Nombre, C.NumeroCuenta, C.FechaCreacion, C.Saldo FROM CuentaAhorro C INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id")
+                    Set rs = con.execute("SELECT C.Id, T.Nombre, C.NumeroCuenta, C.FechaCreacion, C.Saldo FROM CuentaAhorro C INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id")
                     DO UNTIL rs.EOF
                         Response.Write("<tr bgcolor='lightgrey' align='center'>")
                             FOR EACH x IN rs.Fields
@@ -119,7 +120,7 @@
                     LOOP
                 ELSE
                     'Mostrar solo las de usuario
-                    Set rs = con.execute("SELECT T.Nombre, C.NumeroCuenta, C.FechaCreacion, C.Saldo FROM CuentaAhorro C INNER JOIN Usuarios_Ver U ON U.IdCuenta=C.Id INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id WHERE U.Id="&Session("IdUsuario"))
+                    Set rs = con.execute("SELECT C.Id, T.Nombre, C.NumeroCuenta, C.FechaCreacion, C.Saldo FROM CuentaAhorro C INNER JOIN Usuarios_Ver U ON U.IdCuenta=C.Id INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id WHERE U.Id="&Session("IdUsuario"))
                     DO UNTIL rs.EOF
                         Response.Write("<tr bgcolor='lightgrey' align='center'>")
                             FOR EACH x IN rs.Fields
