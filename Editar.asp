@@ -14,7 +14,7 @@
     Set con = Server.CreateObject("Adodb.Connection")
 
     'Open the connection'
-    con.open "BasesD"
+    con.open "Proyecto1"
 
     'Collect data'
     opcion=Request.Form("opcionB")
@@ -41,10 +41,17 @@
         Response.Redirect("BeneficiariosP.asp")
 
     ELSEIF (opcion="porcentaje") THEN
+        On Error Resume Next
         con.execute("UPDATE Beneficiario SET Porcentaje="&CInt(nuevo)&" WHERE Id="&idBen)
         con.close
         set con=nothing
         Response.Redirect("BeneficiariosP.asp")
+        IF Err.Number <> 0 THEN
+            Response.write("<script type=""text/javascript"">alert(""Error: el porcentaje debe ser un número entero"");</script>")  
+            Response.End 
+        END IF
+        On Error GoTo 0
+            
 
     ELSEIF (opcion="fechanacimiento") THEN
         con.execute("UPDATE Persona SET FechaNacimiento='"&nuevo&"' WHERE Id=(SELECT IdPersona FROM Beneficiario WHERE Id="&idBen&")")
