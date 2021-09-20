@@ -176,8 +176,7 @@
           <%END IF
 
         %>
-			</div>
-
+        
         <!-- EDITAR BENEFICIARIOS -->
         <br><hr><br>
         <form action="BeneficiariosP.asp" method="post">
