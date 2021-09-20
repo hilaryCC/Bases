@@ -97,7 +97,7 @@
                     </div>
 
                     <div style="position: absolute; left: 615px; top: 360px;">
-                        <input class="textbox" type="text" id="contrasena" name="contrasena" placeholder="Password">
+                        <input class="textbox" type="password" id="contrasena" name="contrasena" placeholder="Password">
                     </div>
                 
                     <div style="position: absolute; left: 655px; top: 440px;">

@@ -140,14 +140,14 @@
                 <%Response.Write("<tr bgcolor='lightgrey' align='center'>")%>
                <td><%Response.Write(infot)%></td>
              </tr>
-          </table>
+             </table>
 
   				<%
             rec.close
-  					rec.open("SELECT SUM(porcentaje) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")), con
+  					rec.open("SELECT SUM(porcentaje) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")&" AND Activo=1"), con
   					suma = CInt(rec.GetString())
             rec.close
-  					rec.open("SELECT COUNT(*) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")), con
+  					rec.open("SELECT COUNT(*) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")&" AND Activo=1"), con
   					cant = CInt(rec.GetString())
 
             IF (suma<>100)THEN%>
@@ -156,26 +156,40 @@
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
                 <strong>Alerta!</strong> La suma de los porcentajes no da 100.
               </div>
-
           <%END IF 
-            IF (cant<>3) THEN%>
+            IF (cant < 3) THEN%>
               <br>
               <div class="alert">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
                 <strong>Alerta!</strong> La cantidad de beneficiarios es incorrecta.
               </div>
-
-          <%END IF
+              <script type="text/javascript"> 
+                document.getElementById("aceptarAgregar").disabled = false;
+              </script>
+            <%ELSEIF (cant > 3) THEN%>
+              <br>
+              <div class="alert">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>Alerta!</strong> La cantidad de beneficiarios es incorrecta.
+              </div>
+              <script type="text/javascript"> 
+                document.getElementById("aceptarAgregar").disabled = true;
+              </script>
+            <%ELSEIF (cant = 3) THEN%>
+              <script type="text/javascript"> 
+                document.getElementById("aceptarAgregar").disabled = true;
+              </script>
+            <%END IF
   					rec.close
           ELSE%>
+            </table>
             <br>
               <div class="alert">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
                 <strong>Alerta!</strong> No existen beneficiarios
               </div>
-          <%END IF
-
-        %>
+          <%END IF%>
+        
         
         <!-- EDITAR BENEFICIARIOS -->
         <br><hr><br>
@@ -183,7 +197,7 @@
           <label class="titulo">Editar Beneficiarios</label>
           <br><br>
           <label for="numBen">Digite el Id del beneficiario que desea editar: </label>
-          <input type="number" id="quantity" name="quantity">
+          <input type="number" id="quantity" name="quantity" required>
           <br><br>
 
           <label for="optionlbl">Escoja lo que va a editar:</label>
@@ -199,7 +213,7 @@
           <br><br>
 
           <label for="lbl2">Digite la nueva información según lo escogido: </label>
-          <input class="textbox" type="text" id="Infotxt" name="Infotxt" placeholder="Nuevo nombre o etc">
+          <input class="textbox" type="text" id="Infotxt" name="Infotxt" placeholder="Nuevo nombre o etc" required>
           <br><br>
           <!--Boton editar beneficiarios-->
           <button id="aceptarEdit" class="boton" type="submit">Aceptar</button>
@@ -235,16 +249,16 @@
         <br><br>
         <label for="optionlbl">Digite la siguiente información:</label>
         <br><br>
-        <input class="textbox" type="text" name="ValorDocumentoIdentidad" placeholder="Identificación">
+        <input class="textbox" type="text" name="ValorDocumentoIdentidad" placeholder="Identificación" required>
         <br><br>
-        <input class="textbox" type="text" name="parentezco" placeholder="Parentezco">
+        <input class="textbox" type="text" name="parentezco" placeholder="Parentezco" required>
         <br><br> 
         <label for="numBen">Porcentaje: </label>
-        <input type="number" name="porcentaje" min="1" max="100">
+        <input type="number" name="porcentaje" min="1" max="100" required>
         <br><br>
 
         <!--Boton agregar beneficiarios-->
-        <button id="aceptarAgregar" class="boton" type="submit">Aceptar</button>
+        <button id="aceptarAgregar" name="aceptarAgregar" class="boton" type="submit">Aceptar</button>
       </form>
       <br><br><br><hr><br>
 
@@ -253,7 +267,7 @@
         <label class="titulo">Eliminar Beneficiarios</label>
         <br><br>
         <label for="numBen">Digite el Id del beneficiario que desea eliminar: </label>
-        <input type="number" id="quantity" name="beneficiario">
+        <input type="number" id="quantity" name="beneficiario" required>
         <br><br>
         <!--Boton eliminar beneficiarios-->
         <button id="aceptarEliminar" class="boton" type="submit">Aceptar</button>
