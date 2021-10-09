@@ -117,44 +117,51 @@
                     viene = request.form("usuario")
                     If (viene<>"") THEN
                     
-                        ' Se crea el objeto de conexion
+                        Session("nombreUsuario") = request.form("usuario")
                         Set con = Server.CreateObject("Adodb.Connection")
-
+                        con.open "Proyecto1"
+                        
+                        ' Validar usuario
+                        Set objCommand = Server.CreateObject("ADODB.command")
+                        objCommand.ActiveConnection = con
+                        objCommand.CommandType = 4
+                        objCommand.CommandText = "ValidarUser"
+                        objCommand.Parameters.Append objCommand.CreateParameter ("@NameUser", 200, 1, 40, Session("nombreUsuario"))
+                        objCommand.Parameters.Append objCommand.CreateParameter ("@outCodeResult", 3, 2)
+                        objCommand.Parameters.Append objCommand.CreateParameter ("@Encontrado", 3, 2)
+                        objCommand.Execute
+                        Session("existeU") = objCommand.Parameters("@Encontrado")
+                        
                         ' Se crea el objeto recordset
                         Set rec = Server.CreateObject("Adodb.recordset")
-
-                        ' Se abre la conexion
-                        con.open "BasesD" ' nombre del DSN creado
-                        
                         Set rs = con.execute("Select [User] from Usuario")
-
-                        'Validar usuario
-                        DO UNTIL rs.EOF 'EOF = end of file
-                            FOR EACH x IN rs.Fields
-                                IF (x.value = request.form("usuario")) THEN
-                                    Session("existeU") = "1"
-                                    Session("nombreUsuario") = request.form("usuario")
-                                END IF
-                            NEXT
-                            rs.movenext
-                        LOOP
                         
+                        ' Si existe el usuario
                         IF (Session("existeU")<>"0") THEN
-                            rec.open("SELECT Id FROM Usuario WHERE [User]='"&Session("nombreUsuario")&"'"), con
-                            Session("IdUsuario") = CInt(rec.GetString())
+                            ' Obtener el IdUsuario del Usuario
+                            Set cmd1 = Server.CreateObject("ADODB.command")
+                            cmd1.ActiveConnection = con
+                            cmd1.CommandType = 4
+                            cmd1.CommandText = "ConsultaIdUsuario"
+                            cmd1.Parameters.Append cmd1.CreateParameter ("@inNameUser", 200, 1, 40, Session("nombreUsuario"))
+                            cmd1.Parameters.Append cmd1.CreateParameter ("@outIdUsuario", 3, 2)
+                            cmd1.Execute
+                            Session("IdUsuario") = CInt(cmd1.Parameters("@outIdUsuario"))
 
-                            Set rs = con.execute("Select Pass from Usuario WHERE [User]='"&Session("nombreUsuario")&"'")
 
-                            'Validar contraseña 
-                            DO UNTIL rs.EOF 'EOF = end of file
-                                FOR EACH x IN rs.Fields
-                                    IF (x.value = request.form("contrasena")) THEN
-                                        Session("existeC") = "1"
-                                    END IF
-                                NEXT
-                                rs.movenext
-                            LOOP
-                            
+                            ' Validar contraseña 
+                            Set cmd2 = Server.CreateObject("ADODB.command")
+                            cmd2.ActiveConnection = con
+                            cmd2.CommandType = 4
+                            Session("contrasena") = request.form("contrasena")
+                            cmd2.CommandText = "ValidarPass"
+                            cmd2.Parameters.Append cmd2.CreateParameter ("@inNameUser", 200, 1, 40, Session("nombreUsuario"))
+                            cmd2.Parameters.Append cmd2.CreateParameter ("@inContrasena", 200, 1, 40, Session("contrasena"))
+                            cmd2.Parameters.Append cmd2.CreateParameter ("@outCodeResult", 3, 2)
+                            cmd2.Parameters.Append cmd2.CreateParameter ("@outCorrectPass", 3, 2)
+                            cmd2.Execute
+                            Session("existeC") = cmd2.Parameters("@outCorrectPass")
+
                             ' Determinar si puede entrar
                             IF (Session("existeU") = "1") AND (Session("existeC") = "1") THEN
                                 Response.Redirect("InicioP.asp")
@@ -165,6 +172,7 @@
                                 <strong>Error!</strong> Contraseña incorrecta.
                               </div>
                             <%END IF
+                        ' No existe el usuario
                         ELSE 
                             %>
                                 <br>
