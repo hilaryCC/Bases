@@ -142,12 +142,15 @@
                             Set cmd1 = Server.CreateObject("ADODB.command")
                             cmd1.ActiveConnection = con
                             cmd1.CommandType = 4
-                            cmd1.CommandText = "ConsultaIdUsuario"
+                            cmd1.CommandText = "ConsultaUsuario"
                             cmd1.Parameters.Append cmd1.CreateParameter ("@inNameUser", 200, 1, 40, Session("nombreUsuario"))
                             cmd1.Parameters.Append cmd1.CreateParameter ("@outIdUsuario", 3, 2)
+                            cmd1.Parameters.Append cmd1.CreateParameter ("@outIdPersona", 3, 2)
+                            cmd1.Parameters.Append cmd1.CreateParameter ("@outEsAdministrador", 3, 2)
                             cmd1.Execute
                             Session("IdUsuario") = CInt(cmd1.Parameters("@outIdUsuario"))
-
+                            Session("IdPersona") = cmd1.Parameters("@outIdPersona")
+                            Session("EsAdministrador") = cmd1.Parameters("@outEsAdministrador")
 
                             ' Validar contraseña 
                             Set cmd2 = Server.CreateObject("ADODB.command")

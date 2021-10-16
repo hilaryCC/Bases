@@ -108,9 +108,7 @@
             Set rec = Server.CreateObject("Adodb.recordset")
 
             ' Se abre la conexion
-            con.open "BasesD" ' nombre del DSN creado
-
-            Set rs = con.execute("Select * from Beneficiario")
+            con.open "Proyecto1" ' nombre del DSN creado
         %>
         <table>
           <tr bgcolor="grey" width="700">
@@ -123,174 +121,241 @@
               <th>Parentezco</th>
               <th>Porcentaje</th>
           </tr>
-          <%
+        <%
+            ' Determinar cantidad de filas
+            Set cmd = Server.CreateObject("ADODB.command")
+            cmd.ActiveConnection = con
+            cmd.CommandType = 4
+            cmd.CommandText = "ConsultarFilasBN"
+            cmd.Parameters.Append cmd.CreateParameter ("@inId", 3, 1, 4, Session("IdCuenta"))
+            cmd.Parameters.Append cmd.CreateParameter ("@outCantFilas", 3, 2)
+            cmd.Execute
+            Session("CantFilasB") = CInt(cmd.Parameters("@outCantFilas"))
+            IF Session("CantFilasB") > 0 THEN
+                ' Mostrar tabla de beneficiarios 
+                FOR i = 1 to Session("CantFilasB")
+                    Set cmd2 = Server.CreateObject("ADODB.command")
+                    cmd2.ActiveConnection = con
+                    cmd2.CommandType = 4
+                    cmd2.CommandText = "ConsultaFilaBN"
+                    
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@inIdCuenta", 3, 1, 4, Session("IdCuenta"))
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@inIdPersona", 3, 1, 4, i)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outIdBN", 3, 2)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outNombre", 200, 2, 40)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outValorDocumentoIdentidad", 200, 2, 40)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outFechaNacimiento", 200, 2, 40)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outtelefono1", 200, 2, 40)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outtelefono2", 200, 2, 40)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outNombrePa", 200, 2, 40)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outPorcentaje", 200, 2, 40)
+                    cmd2.Execute
+                    existeBen = cmd2.Parameters("@outIdBN")
+                    IF IsNull(existeBen) = False THEN
+                        Response.Write("<tr bgcolor='lightgrey' align='center'>")
+                        Response.Write("<td>" & existeBen & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outNombre") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outValorDocumentoIdentidad") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outFechaNacimiento") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outtelefono1") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outtelefono2") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outNombrePa") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outPorcentaje") & "</td>")
+                        Response.Write("</tr>")
+                    END IF
+                NEXT
+        %>
+        </table>
 
-            ' Mostrar tabla de beneficiarios
-            rsql="SELECT B.Id, P.Nombre, P.ValorDocumentoIdentidad, P.FechaNacimiento, P.telefono1, P.telefono2, Pa.Nombre, B.Porcentaje"
-            rsql=rsql+" FROM dbo.Persona P INNER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona"
-            rsql=rsql+" INNER JOIN dbo.Parentezco Pa ON B.ParentezcoId=Pa.Id where B.IdCuenta="&Session("IdCuenta")
-            rsql=rsql+" AND B.Activo=1"
-            
-            rec.open(rsql), con
-          IF  not rec.EOF THEN
-              infot=rec.GetString(,,"</td><td>","</td><tr bgcolor='lightgrey' align='center'><td>"," ")
+  		<%
+            Set cmd3 = Server.CreateObject("ADODB.command")
+            cmd3.ActiveConnection = con
+            cmd3.CommandType = 4
+            cmd3.CommandText = "ConsultaBeneficarios"
+            cmd3.Parameters.Append cmd3.CreateParameter ("@inIdCuenta", 3, 1, 4, Session("IdCuenta"))
+            cmd3.Parameters.Append cmd3.CreateParameter ("@outSuma", 3, 2)
+            cmd3.Parameters.Append cmd3.CreateParameter ("@outCant", 3, 2)
+            cmd3.Execute
+  			suma = cmd3.Parameters("@outSuma")
+  			cant = cmd3.Parameters("@outCant")
 
-              %>
-              <tr>
-                <%Response.Write("<tr bgcolor='lightgrey' align='center'>")%>
-               <td><%Response.Write(infot)%></td>
-             </tr>
-             </table>
-
-  				<%
-            rec.close
-  					rec.open("SELECT SUM(porcentaje) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")&" AND Activo=1"), con
-  					suma = CInt(rec.GetString())
-            rec.close
-  					rec.open("SELECT COUNT(*) FROM dbo.Beneficiario WHERE IdCuenta="&Session("IdCuenta")&" AND Activo=1"), con
-  					cant = CInt(rec.GetString())
-
-            IF (suma<>100)THEN%>
-              <br>
-    					<div class="alert">
-                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-                <strong>Alerta!</strong> La suma de los porcentajes no da 100.
-              </div>
-          <%END IF 
-            IF (cant < 3) THEN%>
-              <br>
-              <div class="alert">
+            IF (suma<>100)THEN
+        %>
+                <br>
+    	        <div class="alert">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                    <strong>Alerta!</strong> La suma de los porcentajes no da 100.
+                </div>
+        <%
+            END IF 
+            IF (cant < 3) THEN
+        %>
+                <br>
+                <div class="alert">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
                 <strong>Alerta!</strong> La cantidad de beneficiarios es incorrecta.
-              </div>
-              <script type="text/javascript"> 
+                </div>
+                <script type="text/javascript"> 
                 document.getElementById("aceptarAgregar").disabled = false;
-              </script>
-            <%ELSEIF (cant > 3) THEN%>
-              <br>
-              <div class="alert">
+                </script>
+        <%
+            ELSEIF (cant > 3) THEN
+        %>
+                <br>
+                <div class="alert">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
                 <strong>Alerta!</strong> La cantidad de beneficiarios es incorrecta.
-              </div>
-              <script type="text/javascript"> 
+                </div>
+                <script type="text/javascript"> 
                 document.getElementById("aceptarAgregar").disabled = true;
-              </script>
-            <%ELSEIF (cant = 3) THEN%>
-              <script type="text/javascript"> 
+                </script>
+        <%
+            ELSEIF (cant = 3) THEN
+        %>
+                <script type="text/javascript"> 
                 document.getElementById("aceptarAgregar").disabled = true;
-              </script>
-            <%END IF
-  					rec.close
-          ELSE%>
-            </table>
-            <br>
-              <div class="alert">
+                </script>
+        <%
+            END IF
+            ELSE
+        %>
+                </table>
+                <br>
+                <div class="alert">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
                 <strong>Alerta!</strong> No existen beneficiarios
-              </div>
-          <%END IF%>
-        
+                </div>
+        <%
+            END IF
+        %>
         
         <!-- EDITAR BENEFICIARIOS -->
         <br><hr><br>
         <form action="BeneficiariosP.asp" method="post">
-          <label class="titulo">Editar Beneficiarios</label>
-          <br><br>
-          <label for="numBen">Digite el Id del beneficiario que desea editar: </label>
-          <input type="number" id="quantity" name="quantity" required>
-          <br><br>
+            <label class="titulo">Editar Beneficiarios</label>
+            <br><br>
+            <label for="numBen">Digite el Id del beneficiario que desea editar: </label>
+            <input type="number" id="quantity" name="quantity" required>
+            <br><br>
 
-          <label for="optionlbl">Escoja lo que va a editar:</label>
-          <select id="EditOp" name="EditOp">
-              <option value="nombre">Nombre</option>
-              <option value="identificacion">Identificacion</option>
-              <option value="parentezco">Parentezco</option>
-              <option value="porcentaje">Porcentaje</option>
-              <option value="fechanacimiento">Fecha de nacimiento</option>
-              <option value="telefono1">Telefono 1</option>
-              <option value="telefono2">Telefono 2</option>
-          </select>
-          <br><br>
+            <label for="optionlbl">Escoja lo que va a editar:</label>
+            <select id="EditOp" name="EditOp">
+                <option value="nombre">Nombre</option>
+                <option value="identificacion">Identificacion</option>
+                <option value="parentezco">Parentezco</option>
+                <option value="porcentaje">Porcentaje</option>
+                <option value="fechanacimiento">Fecha de nacimiento</option>
+                <option value="telefono1">Telefono 1</option>
+                <option value="telefono2">Telefono 2</option>
+            </select>
+            <br><br>
 
-          <label for="lbl2">Digite la nueva información según lo escogido: </label>
-          <input class="textbox" type="text" id="Infotxt" name="Infotxt" placeholder="Nuevo nombre o etc" required>
-          <br><br>
-          <!--Boton editar beneficiarios-->
-          <button id="aceptarEdit" class="boton" type="submit">Aceptar</button>
-      </form>
+            <label for="lbl2">Digite la nueva información según lo escogido: </label>
+            <input class="textbox" type="text" id="Infotxt" name="Infotxt" placeholder="Nuevo nombre o etc" required>
+            <br><br>
+            <!--Boton editar beneficiarios-->
+            <button id="aceptarEdit" class="boton" type="submit">Aceptar</button>
+        </form>
 
-      <!-- VERIFICAR EL BENEFICIARIO -->
-      <%
+        <!-- VERIFICAR EL BENEFICIARIO -->
+        <%
         viene=Request.Form("Infotxt")
         IF (viene<>"") THEN
-          rec.open("SELECT Id FROM Beneficiario WHERE Id="&Request.Form("quantity")&" AND Activo=1 AND IdCuenta="&Session("IdCuenta")), con
-          IF rec.EOF THEN%>
+          Set cmd4 = Server.CreateObject("ADODB.command")
+          cmd4.ActiveConnection = con
+          cmd4.CommandType = 4
+          cmd4.CommandText = "ValidarBeneficiario"
+          cmd4.Parameters.Append cmd4.CreateParameter ("@inIdBeneficiario", 3, 1, 4, Request.Form("quantity"))
+          cmd4.Parameters.Append cmd4.CreateParameter ("@inIdCuenta", 3, 1, 4, Session("IdCuenta"))
+          cmd4.Parameters.Append cmd4.CreateParameter ("@outCodeResult", 3, 2)
+          cmd4.Parameters.Append cmd4.CreateParameter ("@Encontrado", 3, 2)
+          cmd4.Execute
+  		  existe = cmd4.Parameters("@Encontrado")
+          IF existe = "0" THEN
+        %>
             <br>
             <div class="alert">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
                 <strong>Alerta!</strong> El Id del beneficiario no existe asociado a su cuenta.
-              </div>
-          <%ELSE%>
+            </div>
+        <%
+          ELSE
+        %>
             <form id="AVBene" name="AVBene" action="Editar.asp" method="post" style="display:block">
-              <input type="hidden" id="opcionB" name="opcionB" value="<%Response.write(Request.form("EditOp"))%>">
-              <input type="hidden" id="nuevoB" name="nuevoB" value="<%Response.write(Request.form("Infotxt"))%>">
-              <input type="hidden" id="idB" name="idB" value="<%Response.write(Request.form("quantity"))%>">
+                <input type="hidden" id="opcionB" name="opcionB" value="<%Response.write(Request.form("EditOp"))%>">
+                <input type="hidden" id="nuevoB" name="nuevoB" value="<%Response.write(Request.form("Infotxt"))%>">
+                <input type="hidden" id="idB" name="idB" value="<%Response.write(Request.form("quantity"))%>">
             </form>
             <script>document.getElementById("AVBene").submit()</script>
-          <%END IF
+        <%
+          END IF
         END IF
-      %>
+        %>
 
       <br><br><hr><br>
 
       <!-- AGREGAR BENEFICIARIOS -->
       <form action="Agregar.asp" method="post">
-        <label class="titulo">Agregar Beneficiarios</label>
-        <br><br>
-        <label for="optionlbl">Digite la siguiente información:</label>
-        <br><br>
-        <input class="textbox" type="text" name="ValorDocumentoIdentidad" placeholder="Identificación" required>
-        <br><br>
-        <input class="textbox" type="text" name="parentezco" placeholder="Parentezco" required>
-        <br><br> 
-        <label for="numBen">Porcentaje: </label>
-        <input type="number" name="porcentaje" min="1" max="100" required>
-        <br><br>
+          <label class="titulo">Agregar Beneficiarios</label>
+          <br><br>
+          <label for="optionlbl">Digite la siguiente información:</label>
+          <br><br>
+          <input class="textbox" type="text" name="ValorDocumentoIdentidad" placeholder="Identificación" required>
+          <br><br>
+          <input class="textbox" type="text" name="parentezco" placeholder="Parentezco" required>
+          <br><br> 
+          <label for="numBen">Porcentaje: </label>
+          <input type="number" name="porcentaje" min="1" max="100" required>
+          <br><br>
 
-        <!--Boton agregar beneficiarios-->
-        <button id="aceptarAgregar" name="aceptarAgregar" class="boton" type="submit">Aceptar</button>
+          <!--Boton agregar beneficiarios-->
+          <button id="aceptarAgregar" name="aceptarAgregar" class="boton" type="submit">Aceptar</button>
       </form>
       <br><br><br><hr><br>
 
-      <!-- Eliminar BENEFICIARIOS -->
+      <!-- ELIMINAR BENEFICIARIOS -->
       <form action="BeneficiariosP.asp" method="post">
-        <label class="titulo">Eliminar Beneficiarios</label>
-        <br><br>
-        <label for="numBen">Digite el Id del beneficiario que desea eliminar: </label>
-        <input type="number" id="quantity" name="beneficiario" required>
-        <br><br>
-        <!--Boton eliminar beneficiarios-->
-        <button id="aceptarEliminar" class="boton" type="submit">Aceptar</button>
-        <br>
+          <label class="titulo">Eliminar Beneficiarios</label>
+          <br><br>
+          <label for="numBen">Digite el Id del beneficiario que desea eliminar: </label>
+          <input type="number" id="quantity" name="beneficiario" required>
+          <br><br>
+          <!--Boton eliminar beneficiarios-->
+          <button id="aceptarEliminar" class="boton" type="submit">Aceptar</button>
+          <br>
       </form>
       <!-- VERIFICAR EL BENEFICIARIO -->
-      <%Dim viene1
-        viene1=Request.Form("beneficiario")
-        IF (viene1<>"") THEN
-          rec.open("SELECT Id FROM Beneficiario WHERE Id="&Request.Form("beneficiario")&" AND Activo=1 AND IdCuenta="&Session("IdCuenta")), con
-          IF rec.EOF THEN%>
+      <%
+      Dim viene1
+      viene1=Request.Form("beneficiario")
+      IF (viene1<>"") THEN
+          Set cmd5 = Server.CreateObject("ADODB.command")
+          cmd5.ActiveConnection = con
+          cmd5.CommandType = 4
+          cmd5.CommandText = "ValidarBeneficiario"
+          cmd5.Parameters.Append cmd5.CreateParameter ("@inIdBeneficiario", 3, 1, 4, Request.Form("beneficiario"))
+          cmd5.Parameters.Append cmd5.CreateParameter ("@inIdCuenta", 3, 1, 4, Session("IdCuenta"))
+          cmd5.Parameters.Append cmd5.CreateParameter ("@outCodeResult", 3, 2)
+          cmd5.Parameters.Append cmd5.CreateParameter ("@Encontrado", 3, 2)
+          cmd5.Execute
+  		  existe = cmd5.Parameters("@Encontrado")
+          IF existe = "0" THEN
+      %>
             <br>
             <div class="alert">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
                 <strong>Alerta!</strong> El Id del beneficiario no existe asociado a su cuenta.
-              </div>
-          <%ELSE%>
+            </div>
+      <%
+          ELSE
+      %>
             <form id="ELBene" name="ELBene" action="Eliminar.asp" method="post" style="display:block">
-              <input type="hidden" id="eliminarB" name="eliminarB" value="<%Response.write(Request.form("beneficiario"))%>">
+                <input type="hidden" id="eliminarB" name="eliminarB" value="<%Response.write(Request.form("beneficiario"))%>">
             </form>
             <script>document.getElementById("ELBene").submit()</script>
-          <%END IF
-        END IF
+      <%
+          END IF
+      END IF
       %>
       <br><br><br><br>
       </div>

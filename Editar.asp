@@ -16,35 +16,51 @@
     'Open the connection'
     con.open "Proyecto1"
 
-    'Collect data'
+    'Collect data
     opcion=Request.Form("opcionB")
     nuevo=Request.Form("nuevoB")
     idBen= CInt(Request.Form("idB"))
+    Set cmd = Server.CreateObject("ADODB.command")
+    cmd.ActiveConnection = con
+    cmd.CommandType = 4
+            
 
     'Ejecutar un comando SQL'
     IF (opcion="nombre") THEN
-        con.execute("UPDATE Persona SET Nombre='"&nuevo&"' WHERE Id=(SELECT IdPersona FROM Beneficiario WHERE Id="&idBen&")")
-        con.close
-        set con=nothing
+        cmd.CommandText = "EditNombre"
+        cmd.Parameters.Append cmd.CreateParameter ("@inNuevoNombre", 200, 1, 40, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        cmd.Parameters.Delete 1
         Response.Redirect("BeneficiariosP.asp")
 
     ELSEIF (opcion="identificacion") THEN
-        con.execute("UPDATE Persona SET ValorDocumentoIdentidad="&nuevo&" WHERE Id=(SELECT IdPersona FROM Beneficiario WHERE Id="&idBen&")")
-        con.close
-        set con=nothing
+        cmd.CommandText = "EditIdentidad"
+        cmd.Parameters.Append cmd.CreateParameter ("@inNuevaIden", 3, 1, 4, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        cmd.Parameters.Delete 1
         Response.Redirect("BeneficiariosP.asp")
 
     ELSEIF (opcion="parentezco") THEN
-        con.execute("UPDATE Beneficiario SET ParentezcoId=(SELECT Id FROM Parentezco WHERE Nombre='"&nuevo&"') WHERE Id="&idBen)
-        con.close
-        set con=nothing
+        cmd.CommandText = "EditParentezco"
+        cmd.Parameters.Append cmd.CreateParameter ("@inNuevoParentezco", 200, 1, 40, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        cmd.Parameters.Delete 1
         Response.Redirect("BeneficiariosP.asp")
 
     ELSEIF (opcion="porcentaje") THEN
         On Error Resume Next
-        con.execute("UPDATE Beneficiario SET Porcentaje="&CInt(nuevo)&" WHERE Id="&idBen)
-        con.close
-        set con=nothing
+        cmd.CommandText = "EditPorcentaje"
+        cmd.Parameters.Append cmd.CreateParameter ("@inNuevoPorcentaje", 200, 1, 40, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        cmd.Parameters.Delete 1
         Response.Redirect("BeneficiariosP.asp")
         IF Err.Number <> 0 THEN
             Response.write("<script type=""text/javascript"">alert(""Error: el porcentaje debe ser un número entero"");</script>")  
@@ -54,25 +70,32 @@
             
 
     ELSEIF (opcion="fechanacimiento") THEN
-        con.execute("UPDATE Persona SET FechaNacimiento='"&nuevo&"' WHERE Id=(SELECT IdPersona FROM Beneficiario WHERE Id="&idBen&")")
-        con.close
-        set con=nothing
+        cmd.CommandText = "EditFecha"
+        cmd.Parameters.Append cmd.CreateParameter ("@inNuevaFecha", 200, 1, 40, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        cmd.Parameters.Delete 1
         Response.Redirect("BeneficiariosP.asp")
 
     ELSEIF (opcion="telefono1") THEN
-        con.execute("UPDATE Persona SET telefono1="&nuevo&" WHERE Id=(SELECT IdPersona FROM Beneficiario WHERE Id="&idBen&")")
-        con.close
-        set con=nothing
+        cmd.CommandText = "EditTelefono1"
+        cmd.Parameters.Append cmd.CreateParameter ("@inNuevoTelefono1", 3, 1, 4, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        cmd.Parameters.Delete 1
         Response.Redirect("BeneficiariosP.asp")
 
     ELSEIF (opcion="telefono2") THEN   
-        con.execute("UPDATE Persona SET telefono2="&nuevo&" WHERE Id=(SELECT IdPersona FROM Beneficiario WHERE Id="&idBen&")")
-        con.close
-        set con=nothing
+        cmd.CommandText = "EditTelefono2"
+        cmd.Parameters.Append cmd.CreateParameter ("@inNuevoTelefono2", 3, 1, 4, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        cmd.Parameters.Delete 1
         Response.Redirect("BeneficiariosP.asp")
-
     END IF
- 
 %>
 
 
