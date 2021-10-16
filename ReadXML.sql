@@ -1,13 +1,13 @@
 -- Se deben crear primero las tablas --
 
-USE PXml -- Noombre de la base de datos a usar
+USE Proyecto1 -- Noombre de la base de datos a usar
 GO
 
 DECLARE @myxml XML
 
 SET @myxml = (
 			SELECT * 
-				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea-1- V2.1.xml', SINGLE_BLOB)
+				FROM OPENROWSET(BULK 'C:\Users\vchin\OneDrive\TEC\II semestre 2021\BD 1\Proyecto1\DatosTarea-1- V2.1.xml', SINGLE_BLOB)
 				AS myxml
 			);
 

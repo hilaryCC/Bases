@@ -1,4 +1,4 @@
-USE PXml -- Nombre de la base de datos a usar
+USE Proyecto1 -- Nombre de la base de datos a usar
 GO
 -- En caso de que las tablas ya existan se eliminan --
 ------------------------------------------------------
