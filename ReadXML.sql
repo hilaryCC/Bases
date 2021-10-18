@@ -91,7 +91,7 @@ INSERT INTO @Tcuentas(iden, tipoCuenta, numCuenta, fecha, saldo)
 		T.X.value('@ValorDocumentoIdentidadDelCliente', 'int'),
 		T.X.value('@TipoCuentaId', 'int'),
 		T.X.value('@NumeroCuenta', 'int'),
-		T.X.value('@FechaCreacion', 'date'),
+		T.X.value('../@Fecha', 'date'),
 		T.X.value('@Saldo', 'float')
 	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarCuenta') AS T(X)
 
