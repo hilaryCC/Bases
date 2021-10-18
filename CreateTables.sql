@@ -1,7 +1,19 @@
-USE PXml -- Nombre de la base de datos a usar
+USE Proyecto -- Nombre de la base de datos a usar
 GO
 -- En caso de que las tablas ya existan se eliminan --
 ------------------------------------------------------
+IF OBJECT_ID('CuentaObjetivo') IS NOT NULL
+	DROP TABLE CuentaObjetivo;
+
+IF OBJECT_ID('Movimiento') IS NOT NULL
+	DROP TABLE Movimiento;
+
+IF OBJECT_ID('EstadoCuenta') IS NOT NULL
+	DROP TABLE EstadoCuenta;
+
+IF OBJECT_ID('Tipo_Movimiento') IS NOT NULL
+	DROP TABLE Tipo_Movimiento;
+
 IF OBJECT_ID('Beneficiario') IS NOT NULL
 	DROP TABLE Beneficiario;
 
@@ -25,6 +37,9 @@ IF OBJECT_ID('TipoCuentaAhorro') IS NOT NULL
 
 IF OBJECT_ID('TipoDocuIdentidad') IS NOT NULL
 	DROP TABLE TipoDocuIdentidad;
+
+IF OBJECT_ID('TipoCambio') IS NOT NULL
+	DROP TABLE TipoCambio;
 
 IF OBJECT_ID('Moneda') IS NOT NULL
 	DROP TABLE Moneda;
@@ -125,4 +140,62 @@ CREATE TABLE Usuarios_Ver(
 	[IdCuenta][int],
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id), 
 	FOREIGN KEY (IdUser) REFERENCES Usuario(Id)
+)
+
+CREATE TABLE Tipo_Movimiento(
+	[Id] [int] PRIMARY KEY,
+	[Descripcion] [varchar](50),
+	[Operacion] [int]
+)
+
+CREATE TABLE EstadoCuenta(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[FechaInicio] [date],
+	[FechaFin] [date],
+	[SaldoInicial] [int],
+	[SaldoFinal] [int],
+	[IdCuenta] [int],
+	[OpATM] [int],
+	[SaldoMin] [int]
+	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id)
+)
+
+CREATE TABLE TipoCambio(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[IdMoneda1] [int],
+	[IdMoneda2] [int],
+	[ValorCompra] [int],
+	[ValorVenta] [int],
+	[Fecha] [date]
+	FOREIGN KEY (IdMoneda1) REFERENCES Moneda(Id)
+)
+
+CREATE TABLE Movimiento(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[Fecha] [date],
+	[IdCuenta] [int],
+	[IdEstadoCuenta] [int],
+	[Descripcion][varchar](50),
+	[IdMoneda] [int],
+	[monto] [int],
+	[nuevoSaldo] [int],
+	[IdTipoMov][int],
+	[IdTipoCambio] [int]
+	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id), 
+	FOREIGN KEY (IdMoneda) REFERENCES TipoMoneda(Id),
+	FOREIGN KEY (IdTipoMov) REFERENCES Tipo_Movimiento(Id),
+	FOREIGN KEY (IdEstadoCuenta) REFERENCES EstadoCuenta(Id),
+	FOREIGN KEY (IdTipoCambio) REFERENCES TipoCambio(Id)
+)
+
+CREATE TABLE CuentaObjetivo(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[IdCuenta] [int],
+	[FechaInicio] [date],
+	[FechaFinal] [date],
+	[Cuota] [int],
+	[Objetivo] [varchar](50),
+	[Saldo] [int],
+	[InteresAnual] [int]
+	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id)
 )
