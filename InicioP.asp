@@ -59,6 +59,9 @@
     <div class="navbar">
       <a class="seleccionada" href="#home">Inicio</a>
       <a href="InicioP.asp">Beneficiarios</a>
+      <a href="InicioP.asp">Estados de Cuenta</a>
+      <a href="InicioP.asp">Consulta EC</a>
+      <a href="InicioP.asp">Cuentas Objetivo</a>
     </div>
         
     <%

@@ -84,6 +84,9 @@
     <div class="navbar">
       <a href="InicioP.asp">Inicio</a>
       <a class="seleccionada" href="#beneficiarios">Beneficiarios</a>
+      <a href="EstadosCuentaP.asp">Estados de Cuenta</a>
+      <a href="BeneficiariosP.asp">Consulta EC</a>
+      <a href="CuentasObjetivo.asp">Cuentas Objetivo</a>
     </div>
 
     <div style="padding-left:16px">
@@ -250,7 +253,7 @@
             </select>
             <br><br>
 
-            <label for="lbl2">Digite la nueva información según lo escogido: </label>
+            <label for="lbl2">Digite la nueva informacion segun lo escogido: </label>
             <input class="textbox" type="text" id="Infotxt" name="Infotxt" placeholder="Nuevo nombre o etc" required>
             <br><br>
             <!--Boton editar beneficiarios-->
@@ -298,9 +301,9 @@
       <form action="Agregar.asp" method="post">
           <label class="titulo">Agregar Beneficiarios</label>
           <br><br>
-          <label for="optionlbl">Digite la siguiente información:</label>
+          <label for="optionlbl">Digite la siguiente informacion:</label>
           <br><br>
-          <input class="textbox" type="text" name="ValorDocumentoIdentidad" placeholder="Identificación" required>
+          <input class="textbox" type="text" name="ValorDocumentoIdentidad" placeholder="Identificacion" required>
           <br><br>
           <input class="textbox" type="text" name="parentezco" placeholder="Parentezco" required>
           <br><br> 
