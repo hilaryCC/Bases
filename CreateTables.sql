@@ -1,4 +1,4 @@
-USE Proyecto -- Nombre de la base de datos a usar
+USE Proyecto1 -- Nombre de la base de datos a usar
 GO
 -- En caso de que las tablas ya existan se eliminan --
 ------------------------------------------------------
@@ -196,6 +196,7 @@ CREATE TABLE CuentaObjetivo(
 	[Cuota] [int],
 	[Objetivo] [varchar](50),
 	[Saldo] [int],
-	[InteresAnual] [int]
+	[InteresAnual] [int],
+	[Activo] [bit]
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id)
 )
