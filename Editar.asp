@@ -25,7 +25,7 @@
     cmd.CommandType = 4
             
 
-    'Ejecutar un comando SQL'
+    'Ejecutar un comando SQL
     IF (opcion="nombre") THEN
         cmd.CommandText = "EditNombre"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevoNombre", 200, 1, 40, nuevo)

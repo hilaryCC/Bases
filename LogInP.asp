@@ -132,10 +132,6 @@
                         objCommand.Execute
                         Session("existeU") = objCommand.Parameters("@Encontrado")
                         
-                        ' Se crea el objeto recordset
-                        Set rec = Server.CreateObject("Adodb.recordset")
-                        Set rs = con.execute("Select [User] from Usuario")
-                        
                         ' Si existe el usuario
                         IF (Session("existeU")<>"0") THEN
                             ' Obtener el IdUsuario del Usuario
