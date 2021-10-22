@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE EliminarBeneficiario
 	@inIdBen INT
 	, @outCodeResult INT OUTPUT

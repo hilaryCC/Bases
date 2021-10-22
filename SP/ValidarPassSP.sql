@@ -4,6 +4,9 @@
 --	+ Contraseña ingresada
 -- Salida:
 --	+ Entero: 1 (contraseña correcta) o 0 (contraseña incorrecta)
+USE Proyecto
+GO
+
 CREATE PROCEDURE ValidarPass
 	@inNameUser VARCHAR(40)
 	, @inContrasena VARCHAR(40)

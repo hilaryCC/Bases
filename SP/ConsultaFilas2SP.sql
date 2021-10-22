@@ -3,6 +3,9 @@
 --	+ Id de la cuenta
 -- Salida:
 --	+ Cantidad de filas
+USE Proyecto
+GO
+
 CREATE PROCEDURE ConsultarFilasCuentaAhorro2
 	@inId INT
 	, @outCantFilas INT OUTPUT

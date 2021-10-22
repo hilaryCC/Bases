@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE ValidarIdentificacion
 	@inIdentificacion INT
 	, @outCodeResult INT OUTPUT

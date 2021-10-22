@@ -2,6 +2,9 @@
 -- inner join en TipoCuentaAhorro
 -- Salida:
 --	+ Cantidad de filas 
+USE Proyecto
+GO
+
 CREATE PROCEDURE ConsultaFilasCuentaAhorro
 	@outCantFilas INT OUTPUT
 AS 

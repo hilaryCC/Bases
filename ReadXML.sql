@@ -7,7 +7,7 @@ DECLARE @myxml XML
 
 SET @myxml = (
 			SELECT * 
-				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea-2.xml', SINGLE_BLOB)
+				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea2-6.xml', SINGLE_BLOB)
 				AS myxml
 			);
 
@@ -97,7 +97,7 @@ INSERT INTO @Tcuentas(iden, tipoCuenta, numCuenta, fecha, saldo)
 
 INSERT INTO dbo.CuentaAhorro(IdPersona, TipoCuentaId, NumeroCuenta, FechaCreacion,Saldo)
 	SELECT P.Id, T.tipoCuenta, T.numCuenta, T.fecha, T.saldo 
-		FROM @Tcuentas T INNER JOIN dbo.Persona P ON T.iden = P.ValorDocumentoIdentidad 
+		FROM @Tcuentas T INNER JOIN dbo.Persona P ON T.iden = P.ValorDocumentoIdentidad
 
 -- Beneficiarios --
 DECLARE @Tbeneficiario TABLE(
@@ -162,6 +162,17 @@ INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
 		FROM @Tusuarios_ver Uv INNER JOIN dbo.Usuario U ON Uv.[user] = U.[User]
 							INNER JOIN dbo.CuentaAhorro C ON Uv.numC = C.NumeroCuenta
 
+
+-- Tipo de Cambio --
+INSERT INTO dbo.TipoCambio(IdMoneda1, IdMoneda2, ValorCompra, ValorVenta, Fecha)
+	SELECT
+		2,
+		1,
+		T.X.value('@Compra', 'int'),
+		T.X.value('@Venta', 'int'),
+		T.X.value('../@Fecha', 'date')
+	FROM @myxml.nodes('//Datos/FechaOperacion/TipoCambioDolares') AS T(X)
+
 -- Movimientos --
 DECLARE @Movi TABLE(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
@@ -173,19 +184,40 @@ DECLARE @Movi TABLE(
 	[Tipo] [int]
 );
 
-/*INSERT INTO @Movi(Fecha, Descripcion, IdMoneda, Monto, NumeroCuenta, Tipo)
+INSERT INTO @Movi(Fecha, Descripcion, IdMoneda, Monto, NumeroCuenta, Tipo)
 	SELECT
 		T.X.value('../@Fecha', 'date'),
 		T.X.value('@Descripcion', 'varchar(50)'),
 		T.X.value('@IdMoneda', 'int'),
-		T.X.value('@Monto', 'int'),
+		T.X.value('@Monto', 'float'),
 		T.X.value('@NumeroCuenta', 'int'),
 		T.X.value('@Tipo', 'int')
 	FROM @myxml.nodes('//Datos/FechaOperacion/Movimientos') AS T(X)
 
-INSERT INTO dbo.Movimiento(Fecha, IdCuenta, IdEstadoCuenta, Descripcion, 
-							IdMoneda, monto, nuevoSaldo, IdTipoMov, IdTipoCambio)
-	SELECT TM.Fecha, C.Id, TM.Descripcion, TM.IdMoneda, TM.Monto, C.Saldo, TM.Tipo  FROM @Movi TM 
-	INNER JOIN dbo.CuentaAhorro C ON C.NumeroCuenta=TM.NumeroCuenta ORDER BY TM.Fecha
 
-SELECT * FROM dbo.Movimiento*/
+DECLARE @Actual INT, @Ultimo INT
+		,@Fecha DATE
+		,@FechaParaCierre DATE
+		,@Descripcion VARCHAR(50)
+		,@IdMoneda INT
+		,@Monto FLOAT
+		,@NumeroCuenta INT
+		,@Tipo INT
+
+SELECT @Actual = MIN(Id), @Ultimo = MAX(Id) FROM @Movi
+SELECT @FechaParaCierre = Fecha FROM @Movi WHERE Id = 1
+
+WHILE (@Actual <= @Ultimo)
+BEGIN
+	SELECT @Fecha = Fecha, @Descripcion = Descripcion, @IdMoneda = IdMoneda, 
+					@Monto = Monto, @NumeroCuenta = NumeroCuenta, @Tipo = Tipo
+			FROM @Movi WHERE Id = @Actual
+	IF(@FechaParaCierre < @Fecha)
+	BEGIN
+		SET @FechaParaCierre = @Fecha
+		EXEC CierreEstadosCuenta @FechaParaCierre
+	END
+	EXEC InsertarMov @Fecha, @Descripcion, @IdMoneda, @Monto, @NumeroCuenta, @Tipo  
+		
+	SET @Actual = @Actual + 1
+END

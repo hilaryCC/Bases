@@ -152,11 +152,13 @@ CREATE TABLE EstadoCuenta(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[FechaInicio] [date],
 	[FechaFin] [date],
-	[SaldoInicial] [int],
-	[SaldoFinal] [int],
+	[SaldoInicial] [float],
+	[SaldoFinal] [float],
 	[IdCuenta] [int],
 	[OpATM] [int],
-	[SaldoMin] [int]
+	[OpVentana] [int],
+	[SaldoMin] [float],
+	[Activo] [bit]
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id)
 )
 
@@ -167,7 +169,8 @@ CREATE TABLE TipoCambio(
 	[ValorCompra] [int],
 	[ValorVenta] [int],
 	[Fecha] [date]
-	FOREIGN KEY (IdMoneda1) REFERENCES Moneda(Id)
+	FOREIGN KEY (IdMoneda1) REFERENCES TipoMoneda(Id),
+	FOREIGN KEY (IdMoneda2) REFERENCES TipoMoneda(Id)
 )
 
 CREATE TABLE Movimiento(
@@ -177,8 +180,8 @@ CREATE TABLE Movimiento(
 	[IdEstadoCuenta] [int],
 	[Descripcion][varchar](50),
 	[IdMoneda] [int],
-	[monto] [int],
-	[nuevoSaldo] [int],
+	[monto] [float],
+	[nuevoSaldo] [float],
 	[IdTipoMov][int],
 	[IdTipoCambio] [int]
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id), 

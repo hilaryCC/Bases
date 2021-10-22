@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE EditTelefono1
 	@inNuevoTelefono1 INT
 	, @inIdBen INT

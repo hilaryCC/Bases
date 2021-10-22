@@ -3,6 +3,9 @@
 --	+ Id de la cuenta
 -- Salida:
 --	+ Cantidad de filas
+USE Proyecto
+GO
+
 CREATE PROCEDURE ConsultarFilasBN
 	@inId INT
 	, @outCantFilas INT OUTPUT

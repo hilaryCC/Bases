@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE EditFecha
 	@inNuevaFecha VARCHAR(40)
 	, @inIdBen INT

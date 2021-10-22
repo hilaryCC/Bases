@@ -3,6 +3,8 @@
 --	+ Nombre del usuario
 -- Salida:
 --	+ Entero: 1 (existe) o 0 (no existe)
+USE Proyecto
+GO
 CREATE PROCEDURE ValidarUser
 	@NameUser VARCHAR(40)
 	, @outCodeResult INT OUTPUT

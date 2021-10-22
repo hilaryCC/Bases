@@ -5,6 +5,9 @@
 --	+ Id del usuario
 --  + Id de la persona
 --  + Entero que indica si es administrador: 1(es) o 0 (no es)
+USE Proyecto
+GO
+
 CREATE PROCEDURE ConsultaUsuario
 	@inNameUser VARCHAR(40)
 	, @outIdUsuario INT OUTPUT

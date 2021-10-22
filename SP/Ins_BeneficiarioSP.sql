@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE InsBeneficiario
 	@inIdCuenta INT
 	, @inIdPersona INT

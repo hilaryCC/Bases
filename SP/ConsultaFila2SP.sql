@@ -1,4 +1,7 @@
 -- SP para consulta de una fila de la tabla Cuenta Ahorro
+USE Proyecto
+GO
+
 CREATE PROCEDURE ConsultaFilaCA2
 	@inId INT
 	, @outNombre VARCHAR(40) OUTPUT

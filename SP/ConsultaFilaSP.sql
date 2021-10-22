@@ -1,4 +1,7 @@
 -- Consulta una fila de la tabla Cuenta Ahorro
+USE Proyecto
+GO
+
 CREATE PROCEDURE ConsultaFilaCA
 	@inId INT
 	, @outNombre VARCHAR(40) OUTPUT

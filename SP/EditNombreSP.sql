@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE EditNombre
 	@inNuevoNombre VARCHAR(40)
 	, @inIdBen INT

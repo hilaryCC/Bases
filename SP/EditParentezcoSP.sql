@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE EditParentezco
 	@inNuevoParentezco VARCHAR(40)
 	, @inIdBen INT

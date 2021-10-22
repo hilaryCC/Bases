@@ -10,6 +10,9 @@
 --	+ Telefono 2 de la persona
 --	+ Nombre del parentezco
 --	+ Porcentaje del beneficiario
+USE Proyecto
+GO
+
 CREATE PROCEDURE ConsultaFilaBN
 	@inIdCuenta INT
 	, @inIdPersona INT

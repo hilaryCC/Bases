@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE InsPersona
 	@inTipoD INT
 	, @inNombre VARCHAR(40)

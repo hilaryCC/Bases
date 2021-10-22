@@ -1,4 +1,7 @@
 -- SP para validar que existe un beneficiario
+USE Proyecto
+GO
+
 CREATE PROCEDURE ValidarBeneficiario
 	@inIdBeneficiario INT
 	, @inIdCuenta INT

@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE EditIdentidad
 	@inNuevaIden INT
 	, @inIdBen INT

@@ -1,3 +1,6 @@
+USE Proyecto
+GO
+
 CREATE PROCEDURE EditPorcentaje
 	@inNuevoPorcentaje INT
 	, @inIdBen INT
