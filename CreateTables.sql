@@ -1,4 +1,4 @@
-USE Proyecto1 -- Nombre de la base de datos a usar
+USE Proyecto -- Nombre de la base de datos a usar
 GO
 -- En caso de que las tablas ya existan se eliminan --
 ------------------------------------------------------
@@ -181,6 +181,7 @@ CREATE TABLE Movimiento(
 	[Descripcion][varchar](50),
 	[IdMoneda] [int],
 	[monto] [float],
+	[MontoCambioAplicado] [float],
 	[nuevoSaldo] [float],
 	[IdTipoMov][int],
 	[IdTipoCambio] [int]

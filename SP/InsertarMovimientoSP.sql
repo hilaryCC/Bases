@@ -67,9 +67,9 @@ BEGIN
 					WHERE Id = @IdEstadoCuenta
 
 			INSERT INTO dbo.Movimiento(Fecha, IdCuenta, IdEstadoCuenta, Descripcion, 
-									IdMoneda, monto, nuevoSaldo, IdTipoMov, IdTipoCambio)
+									IdMoneda, monto, MontoCambioAplicado, nuevoSaldo, IdTipoMov, IdTipoCambio)
 				VALUES(@Fecha, @IdCuenta, @IdEstadoCuenta, @Descripcion, @IdMoneda,
-						@Monto, @nuevoSaldo, @TipoMov, @IdTipoCambio)	
+						@Monto, @MontoMismaMoneda, @nuevoSaldo, @TipoMov, @IdTipoCambio)	
 
 			UPDATE dbo.CuentaAhorro SET Saldo = @nuevoSaldo 
 				WHERE Id = @IdCuenta --Actualiza el saldo de la cuenta
