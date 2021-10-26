@@ -7,7 +7,7 @@ DECLARE @myxml XML
 
 SET @myxml = (
 			SELECT * 
-				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea2-6.xml', SINGLE_BLOB)
+				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea2-8.xml', SINGLE_BLOB)
 				AS myxml
 			);
 
@@ -35,7 +35,7 @@ INSERT INTO dbo.Parentezco(Id, Nombre)
 	FROM @myxml.nodes('//Datos/Parentezcos/Parentezco') AS T(X)
 
 -- Tipo de cuenta de ahorro --
-INSERT INTO dbo.TipoCuentaAhorro(Id, Nombre, IdTipoMoneda, SaldoMinimo, MultaSaldoMin, CargoAnual, 
+INSERT INTO dbo.TipoCuentaAhorro(Id, Nombre, IdTipoMoneda, SaldoMinimo, MultaSaldoMin, CargoServicios, 
 								NumRetirosHumano, NumRetirosAutomatico, ComisionHumano, ComisionAutomatico, Interes)
 	SELECT
 		T.X.value('@Id', 'int'),
@@ -43,7 +43,7 @@ INSERT INTO dbo.TipoCuentaAhorro(Id, Nombre, IdTipoMoneda, SaldoMinimo, MultaSal
 		T.X.value('@IdTipoMoneda', 'int'),
 		T.X.value('@SaldoMinimo', 'float'),
 		T.X.value('@MultaSaldoMin', 'float'),
-		T.X.value('@CargoAnual', 'int'),
+		T.X.value('@CargoMensual', 'int'),
 		T.X.value('@NumRetirosHumano', 'int'),
 		T.X.value('@NumRetirosAutomatico', 'int'),
 		T.X.value('@ComisionHumano', 'int'),
