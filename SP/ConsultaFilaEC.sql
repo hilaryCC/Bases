@@ -12,36 +12,13 @@ AS
 BEGIN
 	SET NOCOUNT ON
 	
-	-- Obtener el Id
-	SELECT @outId = Id FROM EstadoCuenta 
-	WHERE IdCuenta=@inIdCuenta 
-	ORDER BY FechaInicio DESC
-	OFFSET @inCont ROWS
-	FETCH NEXT 1 ROW ONLY;
-
-	-- Obtener fecha inicio
-	SELECT @outFechaI = FechaInicio FROM EstadoCuenta 
-	WHERE IdCuenta=@inIdCuenta 
-	ORDER BY FechaInicio DESC
-	OFFSET @inCont ROWS
-	FETCH NEXT 1 ROW ONLY;
-
-	-- Obtener fecha fin
-	SELECT @outFechaF = FechaFin FROM EstadoCuenta 
-	WHERE IdCuenta=@inIdCuenta 
-	ORDER BY FechaInicio DESC
-	OFFSET @inCont ROWS
-	FETCH NEXT 1 ROW ONLY;
-
-	-- Obtener saldo inicial
-	SELECT @outSaldoI = SaldoInicial FROM EstadoCuenta 
-	WHERE IdCuenta=@inIdCuenta 
-	ORDER BY FechaInicio DESC
-	OFFSET @inCont ROWS
-	FETCH NEXT 1 ROW ONLY;
-
-	-- Obtener saldo final
-	SELECT @outSaldoF = SaldoFinal FROM EstadoCuenta 
+	-- Obtener informacion
+	SELECT @outId = Id 
+	, @outFechaI = FechaInicio
+	, @outFechaF = FechaFin
+	, @outSaldoI = SaldoInicial
+	, @outSaldoF = SaldoFinal
+	FROM EstadoCuenta 
 	WHERE IdCuenta=@inIdCuenta 
 	ORDER BY FechaInicio DESC
 	OFFSET @inCont ROWS

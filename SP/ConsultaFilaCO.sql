@@ -11,38 +11,13 @@ AS
 BEGIN
 	SET NOCOUNT ON
 	
-	-- Obtener fecha inicio
-	SELECT @outFechaI = FechaInicio
-	FROM CuentaObjetivo 
-	WHERE Activo = 1 AND Id = @inId
-	AND IdCuenta = @inIdCuenta
-	
-	-- Obtener ficha fin
-	SELECT @outFechaF = FechaFinal
-	FROM CuentaObjetivo 
-	WHERE Activo = 1 AND Id = @inId
-	AND IdCuenta = @inIdCuenta
-
-	-- Obtener Cuota
-	SELECT @outCuota = Cuota
-	FROM CuentaObjetivo 
-	WHERE Activo = 1 AND Id = @inId
-	AND IdCuenta = @inIdCuenta
-
-	-- Obtener Objetivo
-	SELECT @outObjetivo = Objetivo
-	FROM CuentaObjetivo 
-	WHERE Activo = 1 AND Id = @inId
-	AND IdCuenta = @inIdCuenta
-
-	-- Obtener Saldo
-	SELECT @outSaldo = Saldo
-	FROM CuentaObjetivo 
-	WHERE Activo = 1 AND Id = @inId
-	AND IdCuenta = @inIdCuenta
-
-	-- Obtener Interes
-	SELECT @outInteres = InteresAnual
+	-- Obtener variables
+	SELECT @outFechaI = FechaInicio,
+	@outFechaF = FechaFinal,
+	@outCuota = Cuota,
+	@outObjetivo = Objetivo,
+	@outSaldo = Saldo,
+	@outInteres = InteresAnual
 	FROM CuentaObjetivo 
 	WHERE Activo = 1 AND Id = @inId
 	AND IdCuenta = @inIdCuenta
