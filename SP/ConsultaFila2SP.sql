@@ -1,9 +1,10 @@
 -- SP para consulta de una fila de la tabla Cuenta Ahorro
-USE Proyecto
+USE Proyecto1
 GO
 
 CREATE PROCEDURE ConsultaFilaCA2
-	@inId INT
+	@inCont INT
+	, @inIdPersona INT
 	, @outNombre VARCHAR(40) OUTPUT
 	, @outNumeroCuenta VARCHAR(40) OUTPUT
 	, @outFechaCreacion VARCHAR(40) OUTPUT
@@ -11,29 +12,20 @@ CREATE PROCEDURE ConsultaFilaCA2
 AS 
 BEGIN
 	SET NOCOUNT ON
-	-- Obtener nombre 
+
+	-- Obtener informacion
 	SELECT @outNombre = T.Nombre
+	, @outNumeroCuenta = C.NumeroCuenta
+	, @outFechaCreacion = C.FechaCreacion
+	, @outSaldo = C.Saldo
 	FROM CuentaAhorro C INNER JOIN Usuarios_Ver U 
 	ON U.IdCuenta=C.Id INNER JOIN TipoCuentaAhorro T 
 	ON C.TipoCuentaId = T.Id 
-	WHERE U.Id= @inId
-	-- Obtener Numero de Cuenta
-	SELECT @outNumeroCuenta = C.NumeroCuenta
-	FROM CuentaAhorro C INNER JOIN Usuarios_Ver U 
-	ON U.IdCuenta=C.Id INNER JOIN TipoCuentaAhorro T 
-	ON C.TipoCuentaId = T.Id 
-	WHERE U.Id= @inId
-	-- Obtener Fecha de Creacion
-	SELECT @outFechaCreacion = C.FechaCreacion
-	FROM CuentaAhorro C INNER JOIN Usuarios_Ver U 
-	ON U.IdCuenta=C.Id INNER JOIN TipoCuentaAhorro T 
-	ON C.TipoCuentaId = T.Id 
-	WHERE U.Id= @inId
-	-- Obtener Saldo
-	SELECT @outSaldo = C.Saldo
-	FROM CuentaAhorro C INNER JOIN Usuarios_Ver U 
-	ON U.IdCuenta=C.Id INNER JOIN TipoCuentaAhorro T 
-	ON C.TipoCuentaId = T.Id 
-	WHERE U.Id= @inId
+	WHERE IdPersona=@inIdPersona 
+	ORDER BY C.Id
+	OFFSET @inCont ROWS
+	FETCH NEXT 1 ROW ONLY;
+
 	SET NOCOUNT OFF
 END
+

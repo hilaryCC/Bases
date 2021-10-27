@@ -82,6 +82,16 @@
         con.open "Proyecto1" ' nombre del DSN creado
 
         Response.Write("<div style='padding-left:16px'> <h3> Cuentas: </h3></div>")
+
+        ' Determinar el Id Persona del usuario
+        Set cmd0 = Server.CreateObject("ADODB.command")
+        cmd0.ActiveConnection = con
+        cmd0.CommandType = 4
+        cmd0.CommandText = "ConsultaIdPersona"
+        cmd0.Parameters.Append cmd0.CreateParameter ("@inUsuario", 200, 1, 40, Session("nombreUsuario"))
+        cmd0.Parameters.Append cmd0.CreateParameter ("@outIdPersona", 3, 2)
+        cmd0.Execute
+        Session("IdPersonaUsuario") = CInt(cmd0.Parameters("@outIdPersona"))
     %>
     <div style='padding-left:16px'>
         <table>
@@ -137,13 +147,14 @@
                     cmd3.Execute
                     Session("CantFilas2") = CInt(cmd3.Parameters("@outCantFilas"))
                     ' Mostrar las cuentas del usuario
-                    FOR i = 1 to Session("CantFilas2")
+                    FOR i = 0 to Session("CantFilas2")-1
                         Set cmd4 = Server.CreateObject("ADODB.command")
                         cmd4.ActiveConnection = con
                         cmd4.CommandType = 4
                         cmd4.CommandText = "ConsultaFilaCA2"
                         Response.Write("<tr bgcolor='lightgrey' align='center'>")
-                        cmd4.Parameters.Append cmd4.CreateParameter ("@inId", 3, 1, 4, Session("IdUsuario"))
+                        cmd4.Parameters.Append cmd4.CreateParameter ("@inCont", 3, 1, 4, i)
+                        cmd4.Parameters.Append cmd4.CreateParameter ("@inIdPersona", 3, 1, 4, Session("IdPersonaUsuario"))
                         cmd4.Parameters.Append cmd4.CreateParameter ("@outNombre", 200, 2, 40)
                         cmd4.Parameters.Append cmd4.CreateParameter ("@outNumeroCuenta", 200, 2, 40)
                         cmd4.Parameters.Append cmd4.CreateParameter ("@outFechaCreacion", 200, 2, 40)

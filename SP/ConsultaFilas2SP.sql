@@ -3,7 +3,7 @@
 --	+ Id de la cuenta
 -- Salida:
 --	+ Cantidad de filas
-USE Proyecto
+USE Proyecto1
 GO
 
 CREATE PROCEDURE ConsultarFilasCuentaAhorro2
@@ -15,6 +15,7 @@ BEGIN
 	SELECT @outCantFilas = COUNT(0) 
 	FROM CuentaAhorro C INNER JOIN Usuarios_Ver U ON U.IdCuenta=C.Id 
 	INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id
-	WHERE U.Id= @inId;
+	WHERE U.IdUser= @inId;
 	SET NOCOUNT OFF
 END
+
