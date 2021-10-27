@@ -79,9 +79,15 @@ BEGIN
 						,@NumeroCuenta
 						,13
 
-					--Cobro cargos por servicio
-					--Falta de revisar los datos--
-					------------------------------
+					--Cobro mensual cargo por servicio
+					SELECT @MontoMovimiento = CargoServicios
+						FROM dbo.TipoCuentaAhorro C WHERE C.Id = @IdTipoCuenta 
+					EXEC InsertarMov @FechaActual
+						,'Cargo mensual por servicio'
+						,@IdMonedaCuenta
+						,@MontoMovimiento
+						,@NumeroCuenta
+						,12
 
 					--Para comision por Operaciones en Retiros automaticos
 					IF (@OpATMCuenta > @OpATMTC)

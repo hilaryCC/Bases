@@ -86,7 +86,7 @@ CREATE TABLE TipoCuentaAhorro(
 	[IdTipoMoneda] [int],
 	[SaldoMinimo] [float], 
 	[MultaSaldoMin] [float],
-	[CargoAnual] [int], 
+	[CargoServicios] [int], 
 	[NumRetirosHumano] [int], 
 	[NumRetirosAutomatico] [int], 
 	[ComisionHumano] [int],
