@@ -14,10 +14,10 @@ BEGIN
 	
 	-- Obtener informacion
 	SELECT @outId = Id 
-	, @outFechaI = FechaInicio
-	, @outFechaF = FechaFin
-	, @outSaldoI = SaldoInicial
-	, @outSaldoF = SaldoFinal
+	     , @outFechaI = FechaInicio
+	     , @outFechaF = FechaFin
+	     , @outSaldoI = SaldoInicial
+	     , @outSaldoF = SaldoFinal
 	FROM EstadoCuenta 
 	WHERE IdCuenta=@inIdCuenta 
 	ORDER BY FechaInicio DESC

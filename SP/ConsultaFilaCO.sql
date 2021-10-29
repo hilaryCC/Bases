@@ -12,12 +12,12 @@ BEGIN
 	SET NOCOUNT ON
 	
 	-- Obtener variables
-	SELECT @outFechaI = FechaInicio,
-	@outFechaF = FechaFinal,
-	@outCuota = Cuota,
-	@outObjetivo = Objetivo,
-	@outSaldo = Saldo,
-	@outInteres = InteresAnual
+	SELECT @outFechaI = FechaInicio
+	     , @outFechaF = FechaFinal
+	     , @outCuota = Cuota
+	     , @outObjetivo = Objetivo
+	     , @outSaldo = Saldo
+	     , @outInteres = InteresAnual
 	FROM CuentaObjetivo 
 	WHERE Activo = 1 AND Id = @inId
 	AND IdCuenta = @inIdCuenta

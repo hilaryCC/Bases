@@ -12,8 +12,11 @@ CREATE PROCEDURE ConsultarFilasBN
 AS 
 BEGIN
 	SET NOCOUNT ON
+
 	SELECT @outCantFilas = COUNT(0) 
-	FROM dbo.Persona P INNER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona
+	FROM dbo.Persona P 
+	INNER JOIN dbo.Beneficiario B ON P.Id=B.IdPersona
 	INNER JOIN dbo.Parentezco Pa ON B.ParentezcoId=Pa.Id 
+	
 	SET NOCOUNT OFF
 END

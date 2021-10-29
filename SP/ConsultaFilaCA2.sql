@@ -15,12 +15,12 @@ BEGIN
 
 	-- Obtener informacion
 	SELECT @outNombre = T.Nombre
-	, @outNumeroCuenta = C.NumeroCuenta
-	, @outFechaCreacion = C.FechaCreacion
-	, @outSaldo = C.Saldo
-	FROM CuentaAhorro C INNER JOIN Usuarios_Ver U 
-	ON U.IdCuenta=C.Id INNER JOIN TipoCuentaAhorro T 
-	ON C.TipoCuentaId = T.Id 
+	     , @outNumeroCuenta = C.NumeroCuenta
+	     , @outFechaCreacion = C.FechaCreacion
+	     , @outSaldo = C.Saldo
+	FROM CuentaAhorro C 
+	INNER JOIN Usuarios_Ver U ON U.IdCuenta=C.Id
+	INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id 
 	WHERE IdPersona=@inIdPersona 
 	ORDER BY C.Id
 	OFFSET @inCont ROWS

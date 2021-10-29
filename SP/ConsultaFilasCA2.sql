@@ -12,10 +12,13 @@ CREATE PROCEDURE ConsultarFilasCuentaAhorro2
 AS 
 BEGIN
 	SET NOCOUNT ON
+
 	SELECT @outCantFilas = COUNT(0) 
-	FROM CuentaAhorro C INNER JOIN Usuarios_Ver U ON U.IdCuenta=C.Id 
+	FROM CuentaAhorro C 
+	INNER JOIN Usuarios_Ver U ON U.IdCuenta=C.Id 
 	INNER JOIN TipoCuentaAhorro T ON C.TipoCuentaId = T.Id
 	WHERE U.IdUser= @inId;
+	
 	SET NOCOUNT OFF
 END
 

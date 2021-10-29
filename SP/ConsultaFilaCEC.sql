@@ -18,15 +18,15 @@ BEGIN
 			@IdCuenta INT, 
 			@IdMonedaCA INT;
 
-	-- Obtener la fecha y el monto en la moneda del movimiento
-	SELECT @outId = Id, @outFecha = Fecha, 
-		   @outMontoM = monto, 
-	       @outMontoC = MontoCambioAplicado, 
-		   @outDescripcion = Descripcion,
-		   @outNuevoSaldo = nuevoSaldo,
-		   @IdTipoCambio = IdTipoCambio, 
-		   @IdMonedaMov = IdMoneda,
-		   @IdCuenta = IdCuenta
+	-- Obtener infromacion de la tabla movimientos
+	SELECT @outId = Id, @outFecha = Fecha 
+	     , @outMontoM = monto 
+	     , @outMontoC = MontoCambioAplicado 
+		 , @outDescripcion = Descripcion
+		 , @outNuevoSaldo = nuevoSaldo
+		 , @IdTipoCambio = IdTipoCambio 
+		 , @IdMonedaMov = IdMoneda
+		 , @IdCuenta = IdCuenta
 	FROM Movimiento 
 	WHERE IdEstadoCuenta=@inIdEC 
 	ORDER BY Fecha 

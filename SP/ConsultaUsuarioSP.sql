@@ -5,7 +5,7 @@
 --	+ Id del usuario
 --  + Id de la persona
 --  + Entero que indica si es administrador: 1(es) o 0 (no es)
-USE Proyecto
+USE Proyecto1
 GO
 
 CREATE PROCEDURE ConsultaUsuario
@@ -16,17 +16,14 @@ CREATE PROCEDURE ConsultaUsuario
 AS 
 BEGIN
 	SET NOCOUNT ON
-	-- Determinar Id Usuario
+
+	-- Determinar Id Usuario, Id Persona del Usuario y si es administrador
 	SELECT @outIdUsuario = Id
+		 , @outIdPersona = IdPersona
+		 , @outEsAdministrador = EsAdministrador
 	FROM Usuario
 	WHERE [User] = @inNameUser;
-	-- Determinar Id Persona del Usuario
-	SELECT @outIdPersona = IdPersona
-	FROM Usuario
-	WHERE [User] = @inNameUser;
-	-- Determinar si el usuario es administrador
-	SELECT @outEsAdministrador = EsAdministrador
-	FROM Usuario
-	WHERE [User] = @inNameUser;
+
 	SET NOCOUNT OFF
 END
+

@@ -1,6 +1,6 @@
 -- SP para obtener la suma de los porcentajes y
 -- la cantidad de beneficiarios
-USE Proyecto
+USE Proyecto1
 GO
 
 CREATE PROCEDURE ConsultaBeneficarios
@@ -12,10 +12,7 @@ BEGIN
 	SET NOCOUNT ON
 	
 	SELECT @outSuma = SUM(porcentaje) 
-	FROM dbo.Beneficiario 
-	WHERE IdCuenta=@inIdCuenta AND Activo=1
-
-	SELECT @outCant = COUNT(*) 
+		 , @outCant = COUNT(*) 
 	FROM dbo.Beneficiario 
 	WHERE IdCuenta=@inIdCuenta AND Activo=1
 
