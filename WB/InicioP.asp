@@ -62,6 +62,7 @@
       <a href="InicioP.asp">Estados de Cuenta</a>
       <a href="InicioP.asp">Consulta EC</a>
       <a href="InicioP.asp">Cuentas Objetivo</a>
+      <a href="InicioP.asp">Admin</a>
     </div>
         
     <%
@@ -135,7 +136,6 @@
                         Response.Write("<td>" & cmd2.Parameters("@outSaldo") & "</td>")
                         Response.Write("</tr>")
                     NEXT
-
                 ELSE
                     ' Determinar cantidad de filas
                     Set cmd3 = Server.CreateObject("ADODB.command")

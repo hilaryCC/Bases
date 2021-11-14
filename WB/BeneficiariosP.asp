@@ -87,6 +87,7 @@
       <a href="EstadosCuentaP.asp">Estados de Cuenta</a>
       <a href="BeneficiariosP.asp">Consulta EC</a>
       <a href="CuentasObjetivo.asp">Cuentas Objetivo</a>
+      <a href="Admin.asp">Admin</a>
     </div>
 
     <div style="padding-left:16px">

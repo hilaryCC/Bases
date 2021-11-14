@@ -92,6 +92,7 @@
             <a href="EstadosCuentaP.asp">Estados de Cuenta</a>
             <a href="CuentasObjetivo.asp">Consulta EC</a>
             <a class="seleccionada" href="#cuentasObjetivo">Cuentas Objetivo</a>
+            <a href="Admin.asp">Admin</a>
         </div>
         <div style="padding-left:16px">
 
