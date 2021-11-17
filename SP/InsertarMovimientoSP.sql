@@ -3,13 +3,13 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE InsertarMov
-				@Fecha DATE
-				,@Descripcion VARCHAR(50)
-				,@IdMoneda INT
-				,@Monto FLOAT
-				,@NumeroCuenta INT
-				,@TipoMov INT
+CREATE PROCEDURE dbo.InsertarMov
+				@InFecha DATE
+				,@InDescripcion VARCHAR(50)
+				,@InIdMoneda INT
+				,@InMonto FLOAT
+				,@InNumeroCuenta INT
+				,@InTipoMov INT
 AS 
 BEGIN
 	SET NOCOUNT ON
@@ -24,63 +24,74 @@ BEGIN
 				,@MontoMismaMoneda FLOAT 
 				,@OutResultCode INT 
 				,@SaldoMinimo FLOAT
+				,@ValorCompra INT
+				,@ValorVenta INT
+				,@CantOpATM INT
+				,@CantOpVentana INT
 
-		SELECT @IdCuenta = Id FROM dbo.CuentaAhorro C 
-			WHERE C.NumeroCuenta = @NumeroCuenta
-		SELECT @Accion = Operacion FROM dbo.Tipo_Movimiento T 
-			WHERE T.Id = @TipoMov 
-		SELECT @IdEstadoCuenta = Id FROM dbo.EstadoCuenta EC 
-			WHERE EC.IdCuenta = @IdCuenta AND EC.Activo = 1
-		SELECT @IdTipoCambio = Id FROM dbo.TipoCambio TC 
-			WHERE TC.Fecha = @Fecha
-		SELECT @MonedaCuenta = IdTipoMoneda FROM dbo.TipoCuentaAhorro TCA 
-			WHERE TCA.Id = (SELECT TipoCuentaId FROM dbo.CuentaAhorro C 
-								WHERE C.Id = @IdCuenta)
-		SELECT @SaldoActual = Saldo FROM dbo.CuentaAhorro C 
-			WHERE C.Id = @IdCuenta
+		SELECT @IdCuenta = C.Id 
+			   ,@SaldoActual = C.Saldo
+			   ,@MonedaCuenta = TCA.IdTipoMoneda
+			   ,@Accion = TM.Operacion
+			   ,@IdEstadoCuenta = EC.Id
+			   ,@IdTipoCambio = TC.Id
+			   ,@ValorCompra = TC.ValorCompra
+			   ,@ValorVenta = TC.ValorVenta
+		FROM dbo.CuentaAhorro C 
+		INNER JOIN dbo.Tipo_Movimiento TM 
+			ON TM.Id = @InTipoMov
+		INNER JOIN dbo.EstadoCuenta EC
+			ON EC.IdCuenta = C.Id
+		INNER JOIN dbo.TipoCambio TC
+			ON	TC.Fecha = @InFecha
+		INNER JOIN dbo.TipoCuentaAhorro TCA
+			ON TCA.Id = C.TipoCuentaId
+		WHERE (C.NumeroCuenta = @InNumeroCuenta)
+			AND (EC.Activo = 1)
+
+		SET @CantOpATM = 0
+		SET @CantOpVentana = 0
+		
+		IF (@InIdMoneda = 1) AND (@MonedaCuenta = 2) --Movimiento en colones, cuenta en dolares
+			SET @MontoMismaMoneda = @InMonto / @ValorCompra
 			
+		ELSE IF ((@InIdMoneda = 2) AND (@MonedaCuenta = 1)) --Movimiento en dolares, cuenta en colones
+			SET @MontoMismaMoneda = @InMonto * @ValorVenta
+			
+		ELSE --Movimiento y cuenta de la misma moneda
+			SET @MontoMismaMoneda = @InMonto 
+
+		IF (@Accion = 1) --Suma o resta segun el tipo de movimiento
+			SET @nuevoSaldo = @SaldoActual + @MontoMismaMoneda
+		ELSE
+			SET @nuevoSaldo = @SaldoActual - @MontoMismaMoneda
+
+		IF (@InTipoMov = 2) OR (@InTipoMov = 6) OR (@InTipoMov = 10) --Aumento contador de operaciones en cajero Automatico
+			SET @CantOpATM = 1
+			
+		ELSE IF(@InTipoMov = 1) OR (@InTipoMov = 7) OR (@InTipoMov = 9) --Aumento contador de operaciones en ventana
+			SET @CantOpVentana = 1
+				
+		SET TRANSACTION ISOLATION LEVEL READ COMMITTED
 		BEGIN TRANSACTION T1;
-			IF (@IdMoneda = 1) AND (@MonedaCuenta = 2) --Movimiento en colones, cuenta en dolares
-				SET @MontoMismaMoneda = @Monto / (SELECT ValorCompra 
-												FROM dbo.TipoCambio T 
-												WHERE T.Id = @IdTipoCambio)
-			
-			ELSE IF ((@IdMoneda = 2) AND (@MonedaCuenta = 1)) --Movimiento en dolares, cuenta en colones
-				SET @MontoMismaMoneda = @Monto * (SELECT ValorVenta 
-												FROM dbo.TipoCambio T 
-												WHERE T.Id = @IdTipoCambio)
-			
-			ELSE --Movimiento y cuenta de la misma moneda
-				SET @MontoMismaMoneda = @Monto 
-
-			IF (@Accion = 1) --Suma o resta segun el tipo de movimiento
-				SET @nuevoSaldo = @SaldoActual + @MontoMismaMoneda
-			ELSE
-				SET @nuevoSaldo = @SaldoActual - @MontoMismaMoneda
-
-			IF (@TipoMov = 2) OR (@TipoMov = 6) OR (@TipoMov = 10) --Aumento contador de operaciones en cajero Automatico
-				UPDATE dbo.EstadoCuenta SET OpATM = (OpATM + 1) 
-					WHERE Id = @IdEstadoCuenta 
-			
-			ELSE IF(@TipoMov = 1) OR (@TipoMov = 7) OR (@TipoMov = 9) --Aumento contador de operaciones en ventana
-				UPDATE dbo.EstadoCuenta SET OpVentana = (OpVentana + 1) 
-					WHERE Id = @IdEstadoCuenta
-
 			INSERT INTO dbo.Movimiento(Fecha, IdCuenta, IdEstadoCuenta, Descripcion, 
-									IdMoneda, monto, MontoCambioAplicado, nuevoSaldo, IdTipoMov, IdTipoCambio)
-				VALUES(@Fecha, @IdCuenta, @IdEstadoCuenta, @Descripcion, @IdMoneda,
-						@Monto, @MontoMismaMoneda, @nuevoSaldo, @TipoMov, @IdTipoCambio)	
+								IdMoneda, monto, MontoCambioAplicado, nuevoSaldo, IdTipoMov, IdTipoCambio)
+			VALUES(@InFecha, @IdCuenta, @IdEstadoCuenta, @InDescripcion, @InIdMoneda,
+					@InMonto, @MontoMismaMoneda, @nuevoSaldo, @InTipoMov, @IdTipoCambio)
+					
+			SELECT @SaldoMinimo = MIN(nuevoSaldo) FROM dbo.Movimiento --Busca el saldo menor de los movimientos
+				WHERE IdEstadoCuenta = @IdEstadoCuenta
 
 			UPDATE dbo.CuentaAhorro SET Saldo = @nuevoSaldo 
 				WHERE Id = @IdCuenta --Actualiza el saldo de la cuenta
 
-			SELECT @SaldoMinimo = MIN(nuevoSaldo) FROM dbo.Movimiento --Busca el saldo menor de los movimientos
-				WHERE IdEstadoCuenta = @IdEstadoCuenta
-
-			UPDATE dbo.EstadoCuenta --Actualiza el menor saldo hasta el momento según los movimientos realizados
+			UPDATE dbo.EstadoCuenta --Actualiza el estado de cuenta, saldo minimo y contadores
 				SET SaldoMin = @SaldoMinimo
-				WHERE Id = @IdEstadoCuenta  
+					,OpATM = OpATM+@CantOpATM
+					,OpVentana = OpVentana+@CantOpVentana
+				WHERE Id = @IdEstadoCuenta 
 		COMMIT TRANSACTION T1;
+
 		SET @OutResultCode = 0;
 	END TRY
 
@@ -91,5 +102,4 @@ BEGIN
 	END CATCH
 	SET NOCOUNT OFF
 END
-
 
