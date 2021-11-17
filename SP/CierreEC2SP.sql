@@ -108,8 +108,10 @@ BEGIN
 		SET TRANSACTION ISOLATION LEVEL READ COMMITTED
 		BEGIN TRANSACTION T1;
 			--Cierre y apertura de Estado de Cuenta
-			SELECT @SaldoCuenta = Saldo 
-			FROM  dbo.CuentaAhorro
+			SELECT @SaldoCuenta = C.Saldo 
+			FROM  dbo.CuentaAhorro C
+			WHERE C.Id = @InIdCuenta
+
 			UPDATE dbo.EstadoCuenta SET Activo = 0
 									,FechaFin = @InFechaActual
 									,SaldoFinal = @SaldoCuenta

@@ -81,12 +81,58 @@ INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
 	INNER JOIN dbo.CuentaAhorro C 
 		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
 
+
+
 -- Inicia simulacion por fechas --
 
+-- Tablas para bajar todo del xml
 DECLARE @Fechas TABLE(
 	[Fecha] [date]
 );
 
+DECLARE @TipoCambio TABLE(
+	[Venta] [int],
+	[Compra] [int],
+	[Fecha] [date]
+);
+
+DECLARE @Personas TABLE(
+	[TDocu] [int],
+	[Nombre] [varchar](40),
+	[ValorDocu] [int],
+	[Nacimiento] [date],
+	[Email] [varchar](40),
+	[Tel1] [int],
+	[Tel2] [int],
+	[Fecha] [date]
+); 
+
+DECLARE @Cuentas TABLE(
+	[DocuPersona] [int],
+	[TipoCuentaId] [int],
+	[NumeroCuenta] [int],
+	[FechaCreacion] [date],
+	[Saldo] [float]
+);
+
+DECLARE @Beneficiarios TABLE(
+	[NumCuenta] [int],
+	[DocuPersona] [int],
+	[Parentezco] [int],
+	[Porcentaje] [int],
+	[Fecha] [date]
+);
+
+DECLARE @Movimientos TABLE(
+	[Fecha] [date],
+	[Descripcion] [varchar](50),
+	[IdMoneda] [int],
+	[Monto] [int],
+	[NumeroCuenta] [int],
+	[Tipo] [int]
+);
+
+-- Tablas temporales para la simulacion diaria
 DECLARE @MovimientosDia TABLE(
 	[Id] [int] PRIMARY KEY IDENTITY (1,1),
 	[Fecha] [date],
@@ -116,12 +162,60 @@ DECLARE @FechaActual DATE
 		,@IdCCActual INT
 		,@IdCCFinal INT
 
-
+-- Extraccion del xml a las tablas
 INSERT INTO @Fechas(Fecha)
 	SELECT 
 		T.X.value('@Fecha', 'date')
 	FROM @myxml.nodes('//Datos/FechaOperacion') AS T(X)
 
+INSERT INTO @TipoCambio(Venta, Compra, Fecha)
+	SELECT
+		T.X.value('@Compra', 'int'),
+		T.X.value('@Venta', 'int'),
+		T.X.value('../@Fecha', 'date')
+	FROM @myxml.nodes('//Datos/FechaOperacion/TipoCambioDolares') AS T(X)
+
+INSERT INTO @Personas(TDocu, Nombre, ValorDocu, Nacimiento, Email, Tel1, Tel2, Fecha)
+	SELECT
+		T.X.value('@TipoDocuIdentidad', 'int'),
+		T.X.value('@Nombre', 'varchar(40)'),
+		T.X.value('@ValorDocumentoIdentidad', 'int'),
+		T.X.value('@FechaNacimiento', 'date'),
+		T.X.value('@Email', 'varchar(40)'),
+		T.X.value('@Telefono1', 'int'),
+		T.X.value('@Telefono2', 'int'),
+		T.X.value('../@Fecha', 'date')
+	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarPersona') AS T(X)
+
+INSERT INTO @Cuentas(DocuPersona, TipoCuentaId, NumeroCuenta, FechaCreacion,Saldo)
+	SELECT 
+		T.X.value('@ValorDocumentoIdentidadDelCliente', 'int'),
+		T.X.value('@TipoCuentaId', 'int'),
+		T.X.value('@NumeroCuenta', 'int'),
+		T.X.value('../@Fecha', 'date'),
+		T.X.value('@Saldo', 'float')
+	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarCuenta') AS T(X)
+
+INSERT INTO @Beneficiarios(NumCuenta, DocuPersona, Parentezco, Porcentaje)
+	SELECT
+		T.X.value('@NumeroCuenta', 'int'),
+		T.X.value('@ValorDocumentoIdentidadBeneficiario', 'int'),
+		T.X.value('@ParentezcoId', 'int'),
+		T.X.value('@Porcentaje', 'int'),
+		T.X.value('../@Fecha', 'date')
+	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarBeneficiario') AS T(X)
+
+INSERT INTO @Movimientos(Fecha, Descripcion, IdMoneda, Monto, NumeroCuenta, Tipo)
+	SELECT
+		T.X.value('../@Fecha', 'date'),
+		T.X.value('@Descripcion', 'varchar(50)'),
+		T.X.value('@IdMoneda', 'int'),
+		T.X.value('@Monto', 'float'),
+		T.X.value('@NumeroCuenta', 'int'),
+		T.X.value('@Tipo', 'int')
+	FROM @myxml.nodes('//Datos/FechaOperacion/Movimientos') AS T(X)
+
+-- Inicia recorrido por dia --
 SELECT @FechaActual = MIN(Fecha)
 		,@FechaFinal = MAX(Fecha) 
 FROM @Fechas
@@ -131,69 +225,69 @@ BEGIN
 
 	-- Se agrega el tipo de cambio --
 	INSERT INTO dbo.TipoCambio(IdMoneda1, IdMoneda2, ValorCompra, ValorVenta, Fecha)
-	SELECT
-		2,
-		1,
-		T.X.value('@Compra', 'int'),
-		T.X.value('@Venta', 'int'),
-		T.X.value('../@Fecha', 'date')
-	FROM @myxml.nodes('//Datos/FechaOperacion/TipoCambioDolares') AS T(X)
-	WHERE T.X.value('../@Fecha', 'date') = @FechaActual
+		SELECT 
+			2, 
+			1,
+			TC.Compra,
+			TC.Venta,
+			TC.Fecha
+		FROM @TipoCambio TC 
+		WHERE TC.Fecha = @FechaActual
 
 	-- Se agregan las personas del dia --
 	INSERT INTO dbo.Persona(TipoDocuIdentidad, Nombre, ValorDocumentoIdentidad, FechaNacimiento,
 						Email, telefono1, telefono2)
-	SELECT
-		T.X.value('@TipoDocuIdentidad', 'int'),
-		T.X.value('@Nombre', 'varchar(40)'),
-		T.X.value('@ValorDocumentoIdentidad', 'int'),
-		T.X.value('@FechaNacimiento', 'date'),
-		T.X.value('@Email', 'varchar(40)'),
-		T.X.value('@Telefono1', 'int'),
-		T.X.value('@Telefono2', 'int')
-	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarPersona') AS T(X)
-	WHERE T.X.value('../@Fecha', 'date') = @FechaActual
+		SELECT
+			P.TDocu,
+			P.Nombre,
+			P.ValorDocu,
+			P.Nacimiento,
+			P.Email,
+			P.Tel1,
+			P.Tel2
+		FROM @Personas P
+		WHERE P.Fecha = @FechaActual
 
 	-- Se agregan las cuentas del dia --
 	INSERT INTO dbo.CuentaAhorro(IdPersona, TipoCuentaId, NumeroCuenta, FechaCreacion,Saldo)
-	SELECT 
-		P.Id,
-		T.X.value('@TipoCuentaId', 'int'),
-		T.X.value('@NumeroCuenta', 'int'),
-		T.X.value('../@Fecha', 'date'),
-		T.X.value('@Saldo', 'float')
-	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarCuenta') AS T(X)
-	INNER JOIN dbo.Persona P 
-		ON T.X.value('@ValorDocumentoIdentidadDelCliente', 'int') = P.ValorDocumentoIdentidad
-	WHERE T.X.value('../@Fecha', 'date') = @FechaActual
+		SELECT 
+			P.Id,
+			C.TipoCuentaId,
+			C.NumeroCuenta,
+			C.FechaCreacion,
+			C.Saldo
+		FROM @Cuentas C
+		INNER JOIN dbo.Persona P 
+			ON C.DocuPersona = P.ValorDocumentoIdentidad
+		WHERE C.FechaCreacion = @FechaActual
 
 	-- Se agregan los beneficiarios del dia -- 
 	INSERT INTO dbo.Beneficiario(IdCuenta, IdPersona, ParentezcoId, Porcentaje, Activo, FechaDesactivacion)
-	SELECT
-		C.Id,
-		P.Id,
-		T.X.value('@ParentezcoId', 'int'),
-		T.X.value('@Porcentaje', 'int'),
-		1,
-		NULL
-	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarBeneficiario') AS T(X)
-	INNER JOIN dbo.CuentaAhorro C 
-		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
-	INNER JOIN dbo.Persona P
-		ON T.X.value('@ValorDocumentoIdentidadBeneficiario', 'int') = P.ValorDocumentoIdentidad
-	WHERE T.X.value('../@Fecha', 'date') = @FechaActual
+		SELECT
+			C.Id,
+			P.Id,
+			B.Parentezco,
+			B.Porcentaje,
+			1,
+			NULL
+		FROM @Beneficiarios B
+		INNER JOIN dbo.CuentaAhorro C 
+			ON B.NumCuenta = C.NumeroCuenta
+		INNER JOIN dbo.Persona P
+			ON B.DocuPersona = P.ValorDocumentoIdentidad
+		WHERE B.Fecha = @FechaActual
 
 	-- Movimientos del dia --
 	INSERT INTO @MovimientosDia(Fecha, Descripcion, IdMoneda, Monto, NumeroCuenta, Tipo)
-	SELECT
-		T.X.value('../@Fecha', 'date'),
-		T.X.value('@Descripcion', 'varchar(50)'),
-		T.X.value('@IdMoneda', 'int'),
-		T.X.value('@Monto', 'float'),
-		T.X.value('@NumeroCuenta', 'int'),
-		T.X.value('@Tipo', 'int')
-	FROM @myxml.nodes('//Datos/FechaOperacion/Movimientos') AS T(X)
-	WHERE T.X.value('../@Fecha', 'date') = @FechaActual
+		SELECT
+			M.Fecha,
+			M.Descripcion,
+			M.IdMoneda,
+			M.Monto,
+			M.NumeroCuenta,
+			M.Tipo
+		FROM @Movimientos M
+		WHERE M.Fecha = @FechaActual
 
 	SELECT @IdMovActual = MIN(Id)
 		   ,@IdMovFinal = MAX(Id) 
