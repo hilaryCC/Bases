@@ -41,11 +41,27 @@ IF OBJECT_ID('TipoDocuIdentidad') IS NOT NULL
 IF OBJECT_ID('TipoCambio') IS NOT NULL
 	DROP TABLE TipoCambio;
 
-IF OBJECT_ID('Moneda') IS NOT NULL
-	DROP TABLE Moneda;
-
 IF OBJECT_ID('TipoMoneda') IS NOT NULL
 	DROP TABLE TipoMoneda;
+
+IF OBJECT_ID('MovimientosInteresCO') IS NOT NULL
+	DROP TABLE MovimientosInteresCO;
+
+IF OBJECT_ID('TipoMovCOInt') IS NOT NULL
+	DROP TABLE TipoMovCOInt;
+
+IF OBJECT_ID('MovimientosCO') IS NOT NULL
+	DROP TABLE MovimientosInteresCO;
+
+IF OBJECT_ID('TipoMovCO') IS NOT NULL
+	DROP TABLE TipoMovCOInt;
+
+IF OBJECT_ID('Eventos') IS NOT NULL
+	DROP TABLE MovimientosInteresCO;
+
+IF OBJECT_ID('TipoEvento') IS NOT NULL
+	DROP TABLE TipoMovCOInt;
+
 ------------------------------------------------------
 ------------------------------------------------------
 -- Creacion de tablas --
@@ -72,12 +88,6 @@ CREATE TABLE TipoMoneda(
 	[Id] [int] PRIMARY KEY,
 	[Nombre] [varchar](40),
 	[Simbolo] [varchar](1)
-)
-
-CREATE TABLE Moneda(
-	[Id] [int] PRIMARY KEY,
-	[Nombre] [varchar](40)
-	FOREIGN KEY (Id) REFERENCES TipoMoneda(Id)
 )
 
 CREATE TABLE TipoCuentaAhorro(
@@ -200,7 +210,60 @@ CREATE TABLE CuentaObjetivo(
 	[Cuota] [int],
 	[Objetivo] [varchar](50),
 	[Saldo] [int],
-	[InteresAnual] [int],
+	[InteresAcumulado] [int],
 	[Activo] [bit]
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id)
+)
+
+CREATE TABLE TipoMovCOInt(
+	[Id] [int] PRIMARY KEY,
+	[NombreMov] [varchar](50),
+	[Operacion] [int]
+)
+
+CREATE TABLE MovimientosInteresCO(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[IdCuentaOb][int],
+	[IdTipoMov][int],
+	[Descripcion] [varchar](50),
+	[Fecha] [date],
+	[Monto][float],
+	[NuevoInteresAcumulado][float]
+	FOREIGN KEY (IdCuentaOb) REFERENCES CuentaObjetivo(Id),
+	FOREIGN KEY (IdTipoMov) REFERENCES TipoMovCOInt(Id)
+)
+
+CREATE TABLE TipoMovCO(
+	[Id] [int] PRIMARY KEY,
+	[NombreMov] [varchar](50),
+	[Operacion] [int]
+)
+
+CREATE TABLE MovimientosCO(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[IdCuentaOb][int],
+	[IdTipoMov][int],
+	[Descripcion] [varchar](50),
+	[Fecha] [date],
+	[Monto][float],
+	[NuevoSaldo][float]
+	FOREIGN KEY (IdCuentaOb) REFERENCES CuentaObjetivo(Id),
+	FOREIGN KEY (IdTipoMov) REFERENCES TipoMovCO(Id)
+)
+
+CREATE TABLE TipoEvento(
+	[Id] [int] PRIMARY KEY,
+	[Nombre] [varchar](50)
+)
+
+CREATE TABLE Eventos(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[IdTipoEvento][int],
+	[IdUser] [int],
+	[IP][int],
+	[Fecha][date],
+	[XMLAntes][varchar](60),
+	[XMLDespues][varchar](60)
+	FOREIGN KEY (IdTipoEvento) REFERENCES TipoEvento(Id),
+	FOREIGN KEY (IdUser) REFERENCES Usuario(Id)
 )
