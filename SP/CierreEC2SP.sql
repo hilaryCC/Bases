@@ -13,13 +13,13 @@ BEGIN
 		DECLARE @IdEstadoCuenta INT
 				,@InteresCuenta FLOAT
 				,@IdTipoCuenta INT
-				,@SaldoMinimoTC FLOAT
-				,@SaldoMinimoMes FLOAT
+				,@SaldoMinimoTC MONEY
+				,@SaldoMinimoMes MONEY
 				,@OpATMCuenta INT
 				,@OpVentanaCuenta INT
 				,@OpATMTC INT
 				,@OpVentanaTC INT
-				,@MontoMovimiento FLOAT
+				,@MontoMovimiento MONEY
 				,@IdMonedaCuenta INT 
 				,@NumeroCuenta INT
 				,@Exceso INT

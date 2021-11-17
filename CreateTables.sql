@@ -2,6 +2,24 @@ USE Proyecto -- Nombre de la base de datos a usar
 GO
 -- En caso de que las tablas ya existan se eliminan --
 ------------------------------------------------------
+IF OBJECT_ID('MovimientosCO') IS NOT NULL
+	DROP TABLE MovimientosCO;
+
+IF OBJECT_ID('MovimientosInteresCO') IS NOT NULL
+	DROP TABLE MovimientosInteresCO;
+
+IF OBJECT_ID('TipoMovCOInt') IS NOT NULL
+	DROP TABLE TipoMovCOInt;
+
+IF OBJECT_ID('TipoMovCO') IS NOT NULL
+	DROP TABLE TipoMovCO;
+
+IF OBJECT_ID('Eventos') IS NOT NULL
+	DROP TABLE Eventos;
+
+IF OBJECT_ID('TipoEvento') IS NOT NULL
+	DROP TABLE TipoEvento;
+
 IF OBJECT_ID('CuentaObjetivo') IS NOT NULL
 	DROP TABLE CuentaObjetivo;
 
@@ -44,24 +62,6 @@ IF OBJECT_ID('TipoCambio') IS NOT NULL
 IF OBJECT_ID('TipoMoneda') IS NOT NULL
 	DROP TABLE TipoMoneda;
 
-IF OBJECT_ID('MovimientosInteresCO') IS NOT NULL
-	DROP TABLE MovimientosInteresCO;
-
-IF OBJECT_ID('TipoMovCOInt') IS NOT NULL
-	DROP TABLE TipoMovCOInt;
-
-IF OBJECT_ID('MovimientosCO') IS NOT NULL
-	DROP TABLE MovimientosInteresCO;
-
-IF OBJECT_ID('TipoMovCO') IS NOT NULL
-	DROP TABLE TipoMovCOInt;
-
-IF OBJECT_ID('Eventos') IS NOT NULL
-	DROP TABLE MovimientosInteresCO;
-
-IF OBJECT_ID('TipoEvento') IS NOT NULL
-	DROP TABLE TipoMovCOInt;
-
 ------------------------------------------------------
 ------------------------------------------------------
 -- Creacion de tablas --
@@ -94,8 +94,8 @@ CREATE TABLE TipoCuentaAhorro(
 	[Id] [int] PRIMARY KEY,
 	[Nombre] [varchar](40),
 	[IdTipoMoneda] [int],
-	[SaldoMinimo] [float], 
-	[MultaSaldoMin] [float],
+	[SaldoMinimo] [money], 
+	[MultaSaldoMin] [money],
 	[CargoServicios] [int], 
 	[NumRetirosHumano] [int], 
 	[NumRetirosAutomatico] [int], 
@@ -111,7 +111,7 @@ CREATE TABLE CuentaAhorro(
 	[TipoCuentaId] [int],
 	[NumeroCuenta] [int],
 	[FechaCreacion] [date],
-	[Saldo] [float],
+	[Saldo] [money],
 	UNIQUE(NumeroCuenta),
 	FOREIGN KEY (TipoCuentaId) REFERENCES TipoCuentaAhorro(Id),
 	FOREIGN KEY (IdPersona) REFERENCES Persona(Id) 
@@ -162,12 +162,12 @@ CREATE TABLE EstadoCuenta(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[FechaInicio] [date],
 	[FechaFin] [date],
-	[SaldoInicial] [float],
-	[SaldoFinal] [float],
+	[SaldoInicial] [money],
+	[SaldoFinal] [money],
 	[IdCuenta] [int],
 	[OpATM] [int],
 	[OpVentana] [int],
-	[SaldoMin] [float],
+	[SaldoMin] [money],
 	[Activo] [bit]
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id)
 )
@@ -190,9 +190,9 @@ CREATE TABLE Movimiento(
 	[IdEstadoCuenta] [int],
 	[Descripcion][varchar](50),
 	[IdMoneda] [int],
-	[monto] [float],
-	[MontoCambioAplicado] [float],
-	[nuevoSaldo] [float],
+	[monto] [money],
+	[MontoCambioAplicado] [money],
+	[nuevoSaldo] [money],
 	[IdTipoMov][int],
 	[IdTipoCambio] [int]
 	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id), 
@@ -227,7 +227,7 @@ CREATE TABLE MovimientosInteresCO(
 	[IdTipoMov][int],
 	[Descripcion] [varchar](50),
 	[Fecha] [date],
-	[Monto][float],
+	[Monto][money],
 	[NuevoInteresAcumulado][float]
 	FOREIGN KEY (IdCuentaOb) REFERENCES CuentaObjetivo(Id),
 	FOREIGN KEY (IdTipoMov) REFERENCES TipoMovCOInt(Id)
@@ -245,8 +245,8 @@ CREATE TABLE MovimientosCO(
 	[IdTipoMov][int],
 	[Descripcion] [varchar](50),
 	[Fecha] [date],
-	[Monto][float],
-	[NuevoSaldo][float]
+	[Monto][money],
+	[NuevoSaldo][money]
 	FOREIGN KEY (IdCuentaOb) REFERENCES CuentaObjetivo(Id),
 	FOREIGN KEY (IdTipoMov) REFERENCES TipoMovCO(Id)
 )

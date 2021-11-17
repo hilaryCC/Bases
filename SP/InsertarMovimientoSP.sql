@@ -7,7 +7,7 @@ CREATE PROCEDURE dbo.InsertarMov
 				@InFecha DATE
 				,@InDescripcion VARCHAR(50)
 				,@InIdMoneda INT
-				,@InMonto FLOAT
+				,@InMonto MONEY
 				,@InNumeroCuenta INT
 				,@InTipoMov INT
 AS 
@@ -18,12 +18,12 @@ BEGIN
 				,@Accion INT
 				,@IdEstadoCuenta INT
 				,@IdTipoCambio INT
-				,@nuevoSaldo FLOAT
-				,@SaldoActual FLOAT
+				,@nuevoSaldo MONEY
+				,@SaldoActual MONEY
 				,@MonedaCuenta INT
-				,@MontoMismaMoneda FLOAT 
+				,@MontoMismaMoneda MONEY 
 				,@OutResultCode INT 
-				,@SaldoMinimo FLOAT
+				,@SaldoMinimo MONEY
 				,@ValorCompra INT
 				,@ValorVenta INT
 				,@CantOpATM INT

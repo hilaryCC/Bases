@@ -41,8 +41,8 @@ INSERT INTO dbo.TipoCuentaAhorro(Id, Nombre, IdTipoMoneda, SaldoMinimo, MultaSal
 		T.X.value('@Id', 'int'),
 		T.X.value('@Nombre', 'varchar(40)'),
 		T.X.value('@IdTipoMoneda', 'int'),
-		T.X.value('@SaldoMinimo', 'float'),
-		T.X.value('@MultaSaldoMin', 'float'),
+		T.X.value('@SaldoMinimo', 'money'),
+		T.X.value('@MultaSaldoMin', 'money'),
 		T.X.value('@CargoMensual', 'int'),
 		T.X.value('@NumRetirosHumano', 'int'),
 		T.X.value('@NumRetirosAutomatico', 'int'),
@@ -112,7 +112,7 @@ DECLARE @Cuentas TABLE(
 	[TipoCuentaId] [int],
 	[NumeroCuenta] [int],
 	[FechaCreacion] [date],
-	[Saldo] [float]
+	[Saldo] [money]
 );
 
 DECLARE @Beneficiarios TABLE(
@@ -127,7 +127,7 @@ DECLARE @Movimientos TABLE(
 	[Fecha] [date],
 	[Descripcion] [varchar](50),
 	[IdMoneda] [int],
-	[Monto] [int],
+	[Monto] [money],
 	[NumeroCuenta] [int],
 	[Tipo] [int]
 );
@@ -138,7 +138,7 @@ DECLARE @MovimientosDia TABLE(
 	[Fecha] [date],
 	[Descripcion] [varchar](50),
 	[IdMoneda] [int],
-	[Monto] [int],
+	[Monto] [money],
 	[NumeroCuenta] [int],
 	[Tipo] [int]
 );
@@ -193,10 +193,10 @@ INSERT INTO @Cuentas(DocuPersona, TipoCuentaId, NumeroCuenta, FechaCreacion,Sald
 		T.X.value('@TipoCuentaId', 'int'),
 		T.X.value('@NumeroCuenta', 'int'),
 		T.X.value('../@Fecha', 'date'),
-		T.X.value('@Saldo', 'float')
+		T.X.value('@Saldo', 'money')
 	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarCuenta') AS T(X)
 
-INSERT INTO @Beneficiarios(NumCuenta, DocuPersona, Parentezco, Porcentaje)
+INSERT INTO @Beneficiarios(NumCuenta, DocuPersona, Parentezco, Porcentaje, Fecha)
 	SELECT
 		T.X.value('@NumeroCuenta', 'int'),
 		T.X.value('@ValorDocumentoIdentidadBeneficiario', 'int'),
@@ -210,7 +210,7 @@ INSERT INTO @Movimientos(Fecha, Descripcion, IdMoneda, Monto, NumeroCuenta, Tipo
 		T.X.value('../@Fecha', 'date'),
 		T.X.value('@Descripcion', 'varchar(50)'),
 		T.X.value('@IdMoneda', 'int'),
-		T.X.value('@Monto', 'float'),
+		T.X.value('@Monto', 'money'),
 		T.X.value('@NumeroCuenta', 'int'),
 		T.X.value('@Tipo', 'int')
 	FROM @myxml.nodes('//Datos/FechaOperacion/Movimientos') AS T(X)
@@ -330,6 +330,7 @@ BEGIN
 	BEGIN
 		SELECT @CCIdCuenta = CC.IdCuenta
 		FROM @CierreCuentas CC
+		WHERE CC.Id = @IdCCActual
 
 		EXEC dbo.CerrarEC @CCIdCuenta, @FechaActual
 
@@ -341,4 +342,3 @@ BEGIN
 	SET @FechaActual = DATEADD(DAY, 1, @FechaActual)
 END
 
-SELECT * FROM dbo.EstadoCuenta
