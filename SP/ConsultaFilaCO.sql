@@ -17,7 +17,7 @@ BEGIN
 	     , @outCuota = Cuota
 	     , @outObjetivo = Objetivo
 	     , @outSaldo = Saldo
-	     , @outInteres = InteresAnual
+	     , @outInteres = InteresAcumulado
 	FROM CuentaObjetivo 
 	WHERE Activo = 1 AND Id = @inId
 	AND IdCuenta = @inIdCuenta

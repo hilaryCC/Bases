@@ -12,7 +12,7 @@ BEGIN
 	SET NOCOUNT ON
 	BEGIN TRY
 		BEGIN TRANSACTION T1
-			INSERT INTO CuentaObjetivo(IdCuenta, FechaInicio, FechaFinal, Cuota, Objetivo, Saldo, InteresAnual, Activo)
+			INSERT INTO CuentaObjetivo(IdCuenta, FechaInicio, FechaFinal, Cuota, Objetivo, Saldo, InteresAcumulado, Activo)
 			VALUES (@inIdCuenta, @inFechaInicio, @inFechaFinal, @inCuota, @inObjetivo, @inSaldo, @inInteresAnual, 1);
 		COMMIT TRANSACTION t1
 	END TRY
