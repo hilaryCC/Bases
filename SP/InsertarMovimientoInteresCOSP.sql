@@ -1,0 +1,29 @@
+-- SP para insertar movimientos de intereses CO
+
+USE Proyecto
+GO
+
+CREATE PROCEDURE dbo.MovInteresesCO
+				@InIdCO INT
+				,@InFechaActual DATE
+				,@InDescripcion VARCHAR(50)
+				,@InTipoMov INT
+				,@InMonto MONEY
+
+AS 
+BEGIN
+	SET NOCOUNT ON
+	BEGIN TRY
+
+		SET TRANSACTION ISOLATION LEVEL READ COMMITTED
+		BEGIN TRANSACTION T1;
+
+		COMMIT TRANSACTION T1;
+	END TRY
+
+	BEGIN CATCH
+		IF @@tRANCOUNT>0
+			ROLLBACK TRAN T1;
+	END CATCH
+	SET NOCOUNT OFF
+END

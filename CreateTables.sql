@@ -202,17 +202,26 @@ CREATE TABLE Movimiento(
 	FOREIGN KEY (IdTipoCambio) REFERENCES TipoCambio(Id)
 )
 
+CREATE TABLE TasaInteres(
+	[Id] [int] PRIMARY KEY,
+	[Tasa] [float]
+)
+
 CREATE TABLE CuentaObjetivo(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[IdCuenta] [int],
+	[NumeroCO] [int],
+	[Cuota] [int],
 	[FechaInicio] [date],
 	[FechaFinal] [date],
-	[Cuota] [int],
+	[DiaAhorro] [int],
 	[Objetivo] [varchar](50),
-	[Saldo] [int],
-	[InteresAcumulado] [int],
+	[Saldo] [money],
+	[IdTasaInteres] [int],
+	[InteresAcumulado] [money],
 	[Activo] [bit]
-	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id)
+	FOREIGN KEY (IdCuenta) REFERENCES CuentaAhorro(Id),
+	FOREIGN KEY (IdTasaInteres) REFERENCES TasaInteres(Id)
 )
 
 CREATE TABLE TipoMovCOInt(
@@ -228,7 +237,7 @@ CREATE TABLE MovimientosInteresCO(
 	[Descripcion] [varchar](50),
 	[Fecha] [date],
 	[Monto][money],
-	[NuevoInteresAcumulado][float]
+	[NuevoInteresAcumulado][money]
 	FOREIGN KEY (IdCuentaOb) REFERENCES CuentaObjetivo(Id),
 	FOREIGN KEY (IdTipoMov) REFERENCES TipoMovCOInt(Id)
 )

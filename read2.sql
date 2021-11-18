@@ -59,6 +59,28 @@ INSERT INTO dbo.Tipo_Movimiento(Id, Descripcion, Operacion)
 		T.X.value('@Operacion', 'int')
 	FROM @myxml.nodes('//Datos/Tipo_Movimientos/TipoMovimiento') AS T(X)
 
+-- Tipo eventos --
+INSERT INTO dbo.TipoEvento(Id, Nombre)
+	SELECT 
+		T.X.value('@Id', 'int'),
+		T.X.value('@Nombre', 'varchar(50)')
+	FROM @myxml.nodes('//Datos/TipoEventos/TipoEvento') AS T(X)
+
+-- Tipo Movimiento CO --
+INSERT INTO dbo.TipoMovCO(Id, NombreMov, Operacion)
+	SELECT
+		T.X.value('@Id', 'int'),
+		T.X.value('@Descripcion', 'varchar(50)'),
+		T.X.value('@Operacion', 'int')
+	FROM @myxml.nodes('//Datos/Tipo_Movimientos/TipoMovimiento') AS T(X)
+
+-- Tasas de interes --
+INSERT INTO dbo.TasaInteres(Id, Tasa)
+	SELECT
+		T.X.value('@Id', 'int'),
+		T.X.value('@TasaInteres', 'float')
+	FROM @myxml.nodes('//Datos/TasaInteresesCO/TasaInteresCO') AS T(X)
+
 -- Usuarios --
 INSERT INTO dbo.Usuario([user], [pass], IdPersona, EsAdministrador)
 	SELECT
@@ -80,7 +102,6 @@ INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
 		ON T.X.value('@Usuario', 'varchar(40)') = U.[User]
 	INNER JOIN dbo.CuentaAhorro C 
 		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
-
 
 
 -- Inicia simulacion por fechas --
@@ -132,7 +153,17 @@ DECLARE @Movimientos TABLE(
 	[Tipo] [int]
 );
 
--- Tablas temporales para la simulacion diaria
+DECLARE @CuentasCO TABLE(
+	[NumCA] [int],
+	[NumCO] [int],
+	[Monto] [money],
+	[Inicio] [date],
+	[Final] [date],
+	[DiaAhorro] [int],
+	[Objetivo] [varchar](50)
+);
+
+-- Tablas para la simulacion diaria
 DECLARE @MovimientosDia TABLE(
 	[Id] [int] PRIMARY KEY IDENTITY (1,1),
 	[Fecha] [date],
@@ -141,6 +172,11 @@ DECLARE @MovimientosDia TABLE(
 	[Monto] [money],
 	[NumeroCuenta] [int],
 	[Tipo] [int]
+);
+
+DECLARE @AhorroCO TABLE(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[IdCO] [int]
 );
 
 DECLARE @CierreCuentas TABLE(
@@ -161,6 +197,9 @@ DECLARE @FechaActual DATE
 		,@CCIdCuenta INT
 		,@IdCCActual INT
 		,@IdCCFinal INT
+		,@IdAhorroActual INT
+		,@IdAhorroFinal INT
+		,@IdCOAhorro INT
 
 -- Extraccion del xml a las tablas
 INSERT INTO @Fechas(Fecha)
@@ -215,6 +254,17 @@ INSERT INTO @Movimientos(Fecha, Descripcion, IdMoneda, Monto, NumeroCuenta, Tipo
 		T.X.value('@Tipo', 'int')
 	FROM @myxml.nodes('//Datos/FechaOperacion/Movimientos') AS T(X)
 
+INSERT INTO @CuentasCO(NumCA, NumCO, Monto, Inicio, Final, DiaAhorro, Objetivo)
+	SELECT
+		T.X.value('@CuentaMaestra', 'int'),
+		T.X.value('@NumeroCO', 'int'),
+		T.X.value('@MontoAhorrar', 'money'),
+		T.X.value('../@Fecha', 'date'),
+		T.X.value('@FechaFinal', 'date'),
+		T.X.value('@DiadeAhorro', 'int'),
+		T.X.value('@Descripcion', 'varchar(50)')
+	FROM @myxml.nodes('//Datos/FechaOperacion/AgregarCO') AS T(X)
+
 -- Inicia recorrido por dia --
 SELECT @FechaActual = MIN(Fecha)
 		,@FechaFinal = MAX(Fecha) 
@@ -260,6 +310,29 @@ BEGIN
 		INNER JOIN dbo.Persona P 
 			ON C.DocuPersona = P.ValorDocumentoIdentidad
 		WHERE C.FechaCreacion = @FechaActual
+
+	-- Cuentas Objetivo del dia --
+	INSERT INTO dbo.CuentaObjetivo(IdCuenta, NumeroCO, Cuota, FechaInicio, 
+							FechaFinal, DiaAhorro, Objetivo, Saldo, IdTasaInteres, InteresAcumulado, Activo)
+		SELECT 
+			CA.Id,
+			CO.NumCO,
+			CO.Monto,
+			CO.Inicio,
+			CO.Final,
+			CO.DiaAhorro,
+			CO.Objetivo,
+			0,
+			TI.Id,
+			0,
+			1
+		FROM @CuentasCO CO
+		INNER JOIN dbo.CuentaAhorro CA
+			ON CO.NumCA = CA.NumeroCuenta
+		INNER JOIN dbo.TasaInteres TI
+			ON TI.Id = DATEDIFF(MONTH, CO.Inicio, CO.Final)
+		WHERE CO.Inicio = @FechaActual
+
 
 	-- Se agregan los beneficiarios del dia -- 
 	INSERT INTO dbo.Beneficiario(IdCuenta, IdPersona, ParentezcoId, Porcentaje, Activo, FechaDesactivacion)
@@ -315,6 +388,25 @@ BEGIN
 	END
 
 	DELETE @MovimientosDia
+
+	-- Ahorro CO --
+	INSERT INTO @AhorroCO(IdCO)
+	SELECT CO.Id
+	FROM dbo.CuentaObjetivo CO
+	WHERE CO.DiaAhorro = DAY(@FechaActual)
+
+	SELECT @IdAhorroActual = MIN(Id)
+		   ,@IdAhorroFinal = MAX(Id)
+	FROM @AhorroCO
+
+	WHILE(@IdAhorroActual <= @IdAhorroFinal)
+	BEGIN
+		SELECT @IdCOAhorro = CO.IdCO 
+		FROM @AhorroCO CO
+		WHERE CO.Id = @IdAhorroActual
+
+		EXEC dbo.AhorroCO @IdCOAhorro
+	END
 	 
 	-- Cerrar estados de Cuenta -- 
 	INSERT INTO @CierreCuentas(IdCuenta)
