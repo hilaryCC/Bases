@@ -29,7 +29,10 @@ BEGIN
 		WHERE CO.Id = @InIdCO
 
 		IF(@SaldoCO > 0)
-			EXEC dbo.MovimientoInteresCO @InIdCO, @InFechaActual
+			EXEC dbo.MovimientoInteresCO @InIdCO
+										,@InFechaActual
+										,1
+										,'Interes Mensual'
 
 		IF((@SaldoCA - @MontoAhorro) >= 0)
 		BEGIN

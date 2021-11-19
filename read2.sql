@@ -157,10 +157,17 @@ DECLARE @AhorroCO TABLE(
 	[IdCO] [int]
 );
 
+DECLARE @CierreCO TABLE(
+	[Id] [int] PRIMARY KEY IDENTITY(1,1),
+	[IdCO] [int]
+);
+
 DECLARE @CierreCuentas TABLE(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[IdCuenta] [int]
 );
+
+-- Variables necesarias --
 
 DECLARE @FechaActual DATE
 		,@FechaFinal DATE
@@ -178,7 +185,9 @@ DECLARE @FechaActual DATE
 		,@IdAhorroActual INT
 		,@IdAhorroFinal INT
 		,@IdCOAhorro INT
-		,@SaldoCOA INT --Saldo de la CO, para el dia de ahorro
+		,@IdCierreCOActual INT
+		,@IdCierreCOFinal INT
+		,@IdCOCerrar INT
 
 -- Extraccion del xml a las tablas
 INSERT INTO @Fechas(Fecha)
@@ -373,7 +382,7 @@ BEGIN
 	SELECT CO.Id
 	FROM dbo.CuentaObjetivo CO
 	WHERE CO.DiaAhorro = DAY(@FechaActual)
-		AND (CO.Activo = 1)
+		AND CO.Activo = 1
 
 	SELECT @IdAhorroActual = MIN(Id)
 		   ,@IdAhorroFinal = MAX(Id)
@@ -390,6 +399,30 @@ BEGIN
 		SET @IdAhorroActual = @IdAhorroActual + 1
 	END
 	DELETE @AhorroCO
+
+	-- Finalizacion CO --
+	INSERT INTO @CierreCO(IdCO)
+	SELECT CO.Id
+	FROM dbo.CuentaObjetivo CO
+	WHERE CO.FechaFinal = @FechaActual
+		AND CO.Activo = 1
+
+	SELECT @IdCierreCOActual = MIN(Id)
+		   ,@IdCierreCOFinal = MAX(Id)
+	FROM @CierreCO
+
+	WHILE(@IdCierreCOActual <= @IdCierreCOFinal)
+	BEGIN 
+		SELECT @IdCOAhorro = CO.IdCO
+		FROM @CierreCO CO
+		WHERE CO.Id = @IdCierreCOActual
+
+		EXEC dbo.CierreCO @IdCOAhorro, @FechaActual
+
+		SET @IdCierreCOActual = @IdCierreCOActual + 1
+	END
+
+	DELETE @CierreCO
 	 
 	-- Cerrar estados de Cuenta -- 
 	INSERT INTO @CierreCuentas(IdCuenta)
