@@ -7,7 +7,7 @@ DECLARE @myxml XML
 
 SET @myxml = (
 			SELECT * 
-				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea2-8.xml', SINGLE_BLOB)
+				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea3.xml', SINGLE_BLOB)
 				AS myxml
 			);
 
@@ -80,28 +80,6 @@ INSERT INTO dbo.TasaInteres(Id, Tasa)
 		T.X.value('@Id', 'int'),
 		T.X.value('@TasaInteres', 'float')
 	FROM @myxml.nodes('//Datos/TasaInteresesCO/TasaInteresCO') AS T(X)
-
--- Usuarios --
-INSERT INTO dbo.Usuario([user], [pass], IdPersona, EsAdministrador)
-	SELECT
-		T.X.value('@Usuario', 'varchar(40)'),
-		T.X.value('@Pass', 'varchar(40)'),
-		P.Id,
-		T.X.value('@EsAdministrador', 'int')
-	FROM @myxml.nodes('//Datos/Usuarios/Usuario') AS T(X)
-	INNER JOIN dbo.Persona P
-		ON T.X.value('@ValorDocumentoIdentidad', 'int') = P.ValorDocumentoIdentidad
-
--- Usuarios ver --
-INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
-	SELECT
-		U.Id,
-		C.Id
-	FROM @myxml.nodes('//Datos/Usuarios_Ver/UsuarioPuedeVer') AS T(X)
-	INNER JOIN dbo.Usuario U 
-		ON T.X.value('@Usuario', 'varchar(40)') = U.[User]
-	INNER JOIN dbo.CuentaAhorro C 
-		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
 
 
 -- Inicia simulacion por fechas --
@@ -200,6 +178,7 @@ DECLARE @FechaActual DATE
 		,@IdAhorroActual INT
 		,@IdAhorroFinal INT
 		,@IdCOAhorro INT
+		,@SaldoCOA INT --Saldo de la CO, para el dia de ahorro
 
 -- Extraccion del xml a las tablas
 INSERT INTO @Fechas(Fecha)
@@ -394,6 +373,7 @@ BEGIN
 	SELECT CO.Id
 	FROM dbo.CuentaObjetivo CO
 	WHERE CO.DiaAhorro = DAY(@FechaActual)
+		AND (CO.Activo = 1)
 
 	SELECT @IdAhorroActual = MIN(Id)
 		   ,@IdAhorroFinal = MAX(Id)
@@ -405,8 +385,11 @@ BEGIN
 		FROM @AhorroCO CO
 		WHERE CO.Id = @IdAhorroActual
 
-		EXEC dbo.AhorroCO @IdCOAhorro
+		EXEC dbo.AhorroCO @IdCOAhorro, @FechaActual
+
+		SET @IdAhorroActual = @IdAhorroActual + 1
 	END
+	DELETE @AhorroCO
 	 
 	-- Cerrar estados de Cuenta -- 
 	INSERT INTO @CierreCuentas(IdCuenta)
@@ -434,3 +417,29 @@ BEGIN
 	SET @FechaActual = DATEADD(DAY, 1, @FechaActual)
 END
 
+-- Usuarios --
+INSERT INTO dbo.Usuario([user], [pass], IdPersona, EsAdministrador)
+	SELECT
+		T.X.value('@Usuario', 'varchar(40)'),
+		T.X.value('@Pass', 'varchar(40)'),
+		P.Id,
+		T.X.value('@EsAdministrador', 'int')
+	FROM @myxml.nodes('//Datos/Usuarios/Usuario') AS T(X)
+	INNER JOIN dbo.Persona P
+		ON T.X.value('@ValorDocumentoIdentidad', 'int') = P.ValorDocumentoIdentidad
+
+-- Usuarios ver --
+INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
+	SELECT
+		U.Id,
+		C.Id
+	FROM @myxml.nodes('//Datos/Usuarios_Ver/UsuarioPuedeVer') AS T(X)
+	INNER JOIN dbo.Usuario U 
+		ON T.X.value('@Usuario', 'varchar(40)') = U.[User]
+	INNER JOIN dbo.CuentaAhorro C 
+		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
+
+
+SELECT * FROM CuentaObjetivo
+SELECT * FROM MovimientosCO
+SELECT * FROM MovimientosInteresCO

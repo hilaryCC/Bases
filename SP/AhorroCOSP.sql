@@ -5,23 +5,53 @@ GO
 
 CREATE PROCEDURE dbo.AhorroCO
 				@InIdCO INT
-				--,@InFechaActual DATE
+				,@InFechaActual DATE
 AS 
 BEGIN
 	SET NOCOUNT ON
 	BEGIN TRY
 		DECLARE @MontoAhorro MONEY
-				,@IdCA INT
-				,
-		SET TRANSACTION ISOLATION LEVEL READ COMMITTED
-		BEGIN TRANSACTION T1;
+				,@NumCA INT
+				,@SaldoCA MONEY
+				,@IdMonedaCA INT 
+				,@SaldoCO MONEY
+				
+		SELECT @MontoAhorro = CO.Cuota
+			   ,@SaldoCO = CO.Saldo
+			   ,@IdMonedaCA = TCA.IdTipoMoneda
+			   ,@NumCA = CA.NumeroCuenta
+			   ,@SaldoCA = CA.Saldo
+		FROM dbo.CuentaObjetivo CO
+		INNER JOIN dbo.CuentaAhorro CA
+			ON CA.Id = CO.IdCuenta
+		INNER JOIN dbo.TipoCuentaAhorro TCA
+			ON CA.TipoCuentaId = TCA.Id
+		WHERE CO.Id = @InIdCO
 
-		COMMIT TRANSACTION T1;
+		IF(@SaldoCO > 0)
+			EXEC dbo.MovimientoInteresCO @InIdCO, @InFechaActual
+
+		IF((@SaldoCA - @MontoAhorro) >= 0)
+		BEGIN
+			EXEC dbo.InsertarMov @InFechaActual
+								,'Ahorro Cuenta Objetivo'
+								,@IdMonedaCA
+								,@MontoAhorro
+								,@NumCA
+								,14
+
+			EXEC dbo.MovimientoCO @InIdCO
+								,@InFechaActual
+								,'Ahorro Mensual'
+								,1
+								,@MontoAhorro
+		END
+
 	END TRY
-
 	BEGIN CATCH
 		IF @@tRANCOUNT>0
 			ROLLBACK TRAN T1;
 	END CATCH
 	SET NOCOUNT OFF
 END
+

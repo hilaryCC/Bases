@@ -23,6 +23,9 @@ IF OBJECT_ID('TipoEvento') IS NOT NULL
 IF OBJECT_ID('CuentaObjetivo') IS NOT NULL
 	DROP TABLE CuentaObjetivo;
 
+IF OBJECT_ID('TasaInteres') IS NOT NULL
+	DROP TABLE TasaInteres;
+
 IF OBJECT_ID('Movimiento') IS NOT NULL
 	DROP TABLE Movimiento;
 
@@ -224,22 +227,14 @@ CREATE TABLE CuentaObjetivo(
 	FOREIGN KEY (IdTasaInteres) REFERENCES TasaInteres(Id)
 )
 
-CREATE TABLE TipoMovCOInt(
-	[Id] [int] PRIMARY KEY,
-	[NombreMov] [varchar](50),
-	[Operacion] [int]
-)
-
 CREATE TABLE MovimientosInteresCO(
 	[Id] [int] PRIMARY KEY IDENTITY(1,1),
 	[IdCuentaOb][int],
-	[IdTipoMov][int],
 	[Descripcion] [varchar](50),
 	[Fecha] [date],
 	[Monto][money],
 	[NuevoInteresAcumulado][money]
-	FOREIGN KEY (IdCuentaOb) REFERENCES CuentaObjetivo(Id),
-	FOREIGN KEY (IdTipoMov) REFERENCES TipoMovCOInt(Id)
+	FOREIGN KEY (IdCuentaOb) REFERENCES CuentaObjetivo(Id)
 )
 
 CREATE TABLE TipoMovCO(
