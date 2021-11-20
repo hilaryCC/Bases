@@ -14,9 +14,10 @@ BEGIN
 				,@NumCA INT
 				,@SaldoCA MONEY
 				,@IdMonedaCA INT 
-				,@SaldoCO MONEY
+				,@TotalSaldoCO MONEY
 				
 		SELECT @InteresAcumulado = CO.InteresAcumulado
+			   ,@TotalSaldoCO = CO.Saldo + CO.InteresAcumulado
 			   ,@IdMonedaCA = TCA.IdTipoMoneda
 			   ,@NumCA = CA.NumeroCuenta
 			   ,@SaldoCA = CA.Saldo
@@ -38,20 +39,16 @@ BEGIN
 							,2
 							,@InteresAcumulado
 
-		SELECT @SaldoCO = CO.Saldo
-		FROM dbo.CuentaObjetivo CO
-		WHERE CO.Id = @InIdCO
-
 		EXEC dbo.MovimientoCO @InIdCO
 							,@InFechaActual
 							,'Debito Redencion Cuenta Objetivo'
 							,3
-							,@SaldoCO
+							,@TotalSaldoCO
 
 		EXEC dbo.InsertarMov @InFechaActual
 							,'Credito Redencion Cuenta Objetivo'
 							,@IdMonedaCA
-							,@SaldoCO
+							,@TotalSaldoCO
 							,@NumCA
 							,15
 

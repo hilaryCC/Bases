@@ -72,7 +72,7 @@ INSERT INTO dbo.TipoMovCO(Id, NombreMov, Operacion)
 		T.X.value('@Id', 'int'),
 		T.X.value('@Descripcion', 'varchar(50)'),
 		T.X.value('@Operacion', 'int')
-	FROM @myxml.nodes('//Datos/Tipo_Movimientos/TipoMovimiento') AS T(X)
+	FROM @myxml.nodes('//Datos/TipoMovimientosCO/TipoMovimientoCO') AS T(X)
 
 -- Tasas de interes --
 INSERT INTO dbo.TasaInteres(Id, Tasa)
@@ -471,8 +471,3 @@ INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
 		ON T.X.value('@Usuario', 'varchar(40)') = U.[User]
 	INNER JOIN dbo.CuentaAhorro C 
 		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
-
-
-SELECT * FROM CuentaObjetivo
-SELECT * FROM MovimientosCO
-SELECT * FROM MovimientosInteresCO
