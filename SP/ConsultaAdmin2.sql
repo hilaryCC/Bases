@@ -3,7 +3,11 @@ GO
 CREATE PROCEDURE ConsultaAdmin2
 	@inIdCuenta INT,
 	@inDias INT,
-	@outInfo INT OUTPUT
+	@outInfo INT OUTPUT,
+	@outMesMasOp INT OUTPUT,
+	@outAnoMasOp INT OUTPUT,
+	@outProm INT OUTPUT,
+	@outNumeroCuenta VARCHAR(40) OUTPUT
 AS 
 BEGIN
 	SET NOCOUNT ON
@@ -19,15 +23,17 @@ BEGIN
 		  , @FechaActual DATE
 		  , @Contador INT=1
 		  , @HuboOpATM INT=0
-		  , @MesMasOp INT
-		  , @AnoMasOp INT;
+		  , @SumaTotal INT
+		  , @CantOp INT;
+
 
 	-- ==================== PRIMERA CONDICION =====================
 
 	-- 1: Determinar la cantidad de operaciones que puede hacer
 
-	-- Determinar el tipo de cuenta
-	SELECT @TipoCuentaId = TipoCuentaId 
+	-- Determinar el tipo de cuenta y el numero de cuenta
+	SELECT @TipoCuentaId = TipoCuentaId,
+	@outNumeroCuenta = NumeroCuenta
 	FROM CuentaAhorro
 	WHERE Id=@inIdCuenta;
 
@@ -116,7 +122,7 @@ BEGIN
 
 	IF @CumpleCon1 = 1 OR @CumpleCon2 = 1
 	BEGIN
-
+		print 'hola'
 		-- Colocar un 1 en la variabla para que
 		-- en la capa logica se sepa si hay que
 		-- desplegar informacion de esta cuenta o no
@@ -125,29 +131,35 @@ BEGIN
 
 		-- 7: Determinar el promedio de 
 		-- operaciones ATM por mes
+		SELECT @SumaTotal = SUM(OpAtm) 
+		FROM dbo.EstadoCuenta 
+		WHERE IdCuenta=@inIdCuenta
 
+		SELECT @CantOp =  COUNT(*) 
+		FROM dbo.EstadoCuenta 
+		WHERE IdCuenta=@inIdCuenta
+
+		SET @outProm = @SumaTotal / @CantOp
 
 		-- 8: Determinar el mes con mayor 
 		-- cantidad de operaciones
 		
-		SELECT TOP 1 @MesMasOp = DATEPART(MONTH, Fecha)
+		SELECT TOP 1 @outMesMasOp = DATEPART(MONTH, Fecha)
 		FROM dbo.Movimiento
 		WHERE IdTipoMov=10
 		AND IdCuenta=@inIdCuenta
 		GROUP BY DATEPART(MONTH, Fecha) 
 		ORDER BY COUNT(*) DESC
-		
+
 		-- 9: Determinar el año con mayor 
 		-- cantidad de operaciones
 		
-		SELECT TOP 1 @AnoMasOp = DATEPART(YEAR, Fecha)
+		SELECT TOP 1 @outAnoMasOp = DATEPART(YEAR, Fecha)
 		FROM dbo.Movimiento
 		WHERE IdTipoMov=10
 		AND IdCuenta=@inIdCuenta
 		GROUP BY DATEPART(YEAR, Fecha) 
 		ORDER BY COUNT(*) DESC
-
-
 
 	END ELSE
 	BEGIN
