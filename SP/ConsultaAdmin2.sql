@@ -12,104 +12,81 @@ AS
 BEGIN
 	SET NOCOUNT ON
 	
-	DECLARE @TipoCuentaId INT
-	      , @CantOpATMHechas INT
-		  , @CantOpATMHechas2 INT=0
-	      , @CantOpPermitidas INT
-	      , @CumpleCon1 BIT=0
+	DECLARE @CumpleCon1 BIT=0
 		  , @CumpleCon2 BIT=0
 		  , @FechaFinal DATE
 		  , @FechaInicio DATE
 		  , @FechaActual DATE
+		  , @HayMulta INT=0
+		  , @CantOpATMHechas INT=0
+		  , @CantOpATMHechas2 INT=0
+		  , @CantOpATMtotal INT=0
 		  , @Contador INT=1
 		  , @HuboOpATM INT=0
 		  , @SumaTotal INT
-		  , @CantOp INT;
+		  , @CantOp INT
+		  , @IdFechaF INT
+		  , @IdActual INT;
 
 
 	-- ==================== PRIMERA CONDICION =====================
 
-	-- 1: Determinar la cantidad de operaciones que puede hacer
+	-- 1: Determinar el id de la tabla movimientos con tipo mov 10
+	-- ya que estos son los movimientos por multa por exceso de
+	-- operaciones en cajero automatico. 
 
-	-- Determinar el tipo de cuenta y el numero de cuenta
-	SELECT @TipoCuentaId = TipoCuentaId,
-	@outNumeroCuenta = NumeroCuenta
-	FROM CuentaAhorro
-	WHERE Id=@inIdCuenta;
-
-	-- Determinar cuantas operaciones en ATM puede hacer segun el tipo de cuenta
-	SELECT @CantOpPermitidas = NumRetirosAutomatico 
-	FROM TipoCuentaAhorro
-	WHERE Id=@TipoCuentaId;
-
-	-- 2: Determinar la cantidad de operaciones totales en atm que hizo
-
-	SELECT @CantOpATMHechas = COUNT(*)
-	FROM dbo.Movimiento
+	SELECT @HayMulta = Id
+	FROM Movimiento 
 	WHERE IdTipoMov=10
-	AND IdCuenta=@inIdCuenta;
+	AND IdCuenta=@inIdCuenta
+	
+	-- 2: Determinar si se cumple la condicion. Si la variable 
+	-- @HayMulta es nula entonces no hubo ninguna multa, de lo 
+	-- contrario si hubo
 
-	-- 3: Determinar si se cumple la condicion
-
-	IF @CantOpATMHechas > @CantOpPermitidas
+	IF @HayMulta IS NOT NULL
 	BEGIN
 		SET @CumpleCon1=1;
 	END;
-
+	
 	-- ==================== SEGUNDA CONDICION =====================
 
 	-- 1: Obtener la ultima fecha
 	
-	SELECT TOP 1 @FechaFinal= Fecha 
+	SELECT TOP 1 @FechaFinal= Fecha
 	FROM Movimiento 
 	ORDER BY Id DESC
 
-	-- 2: Guardar la fecha final en la variable
-	-- fecha actual, la cual va a ayudar a determinar
-	-- cuando se debe parar el ciclo
-	
-	SET @FechaActual=@FechaFinal
-
-	-- 3: Determinar la fecha en la que se debe terminar
+	-- 2: Determinar la fecha en la que se debe terminar
 	-- de contar operaciones
-
 	SELECT @FechaInicio = DATEADD(DAY, -@inDias, @FechaFinal);
 
-	-- 4: Recorrer la tabla de movimientos en los que 
-	-- el id sea el de la cuenta actual y en el que el
-	-- tipo de movimiento sea una operacion ATM para poder
-	-- determinar cuantas operaciones se hicieron en los 
-	-- ultimos N dias
+	-- 3: Determinar la cantidad de fechas mayores
+	-- a la fecha inicio en las que se hicieron 
+	-- operacion en atm
+	SELECT @CantOpATMHechas = COUNT(*)
+	FROM Movimiento 
+	WHERE IdCuenta=@inIdCuenta
+	AND IdTipoMov=6
+	AND Fecha > @FechaInicio
+	ORDER BY 1 DESC;
 	
-	WHILE @Contador <= @inDias
-	BEGIN
+	-- 4: Determinar la cantidad de fechas iguales 
+	-- a la fecha inicio en las que se hicieron 
+	-- operacion en atm
+	SELECT @CantOpATMHechas2 = COUNT(*)
+	FROM Movimiento 
+	WHERE IdCuenta=@inIdCuenta
+	AND IdTipoMov=6
+	AND Fecha = @FechaInicio
+	ORDER BY 1 DESC;
 
-		-- Determinar si se hizo un movimiento en esta fecha
-
-		SELECT @HuboOpATM = Id
-		FROM dbo.Movimiento
-		WHERE IdTipoMov=10
-		AND IdCuenta=@inIdCuenta
-		AND Fecha=@FechaActual;
-
-		-- Si la varible es diferente de 0, entonces 
-		-- se hizo una operacion ATM este dia
-
-		IF @HuboOpATM != 0 
-		BEGIN
-			SET @CantOpATMHechas2 += 1;
-		END
-
-		-- Se coloca la nueva fecha actual (un dia antes)
-
-		SET @FechaActual = DATEADD(DAY, -1, @FechaActual);
-		SET @Contador += 1;
-	END
+	-- 5: Guardar la suma de ambas cantidad en una variable
+	SET @CantOpATMtotal = @CantOpATMHechas + @CantOpATMHechas2;
 
 	-- 5: Determinar si las operaciones hechas
 	-- en los ultimos N dias fueron mayor a 5
-
-	IF 5 <= @CantOpATMHechas2 
+	IF 5 <= @CantOpATMtotal 
 	BEGIN
 		SET @CumpleCon2=1;
 	END;
@@ -122,7 +99,7 @@ BEGIN
 
 	IF @CumpleCon1 = 1 OR @CumpleCon2 = 1
 	BEGIN
-		print 'hola'
+
 		-- Colocar un 1 en la variabla para que
 		-- en la capa logica se sepa si hay que
 		-- desplegar informacion de esta cuenta o no
@@ -146,7 +123,7 @@ BEGIN
 		
 		SELECT TOP 1 @outMesMasOp = DATEPART(MONTH, Fecha)
 		FROM dbo.Movimiento
-		WHERE IdTipoMov=10
+		WHERE IdTipoMov=6
 		AND IdCuenta=@inIdCuenta
 		GROUP BY DATEPART(MONTH, Fecha) 
 		ORDER BY COUNT(*) DESC
@@ -156,7 +133,7 @@ BEGIN
 		
 		SELECT TOP 1 @outAnoMasOp = DATEPART(YEAR, Fecha)
 		FROM dbo.Movimiento
-		WHERE IdTipoMov=10
+		WHERE IdTipoMov=6
 		AND IdCuenta=@inIdCuenta
 		GROUP BY DATEPART(YEAR, Fecha) 
 		ORDER BY COUNT(*) DESC
@@ -165,6 +142,12 @@ BEGIN
 	BEGIN
 	   SET @outInfo = 0;
 	END;
+
+	-- Determinar el numero de cuenta
+	SELECT @outNumeroCuenta = NumeroCuenta
+	FROM CuentaAhorro
+	WHERE Id=@inIdCuenta;
+
 
 	SET NOCOUNT OFF
 END
