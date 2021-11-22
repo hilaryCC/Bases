@@ -7,7 +7,7 @@ DECLARE @myxml XML
 
 SET @myxml = (
 			SELECT * 
-				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea3.xml', SINGLE_BLOB)
+				FROM OPENROWSET(BULK 'C:\Users\Administrador\Downloads\Telegram Desktop\DatosTarea3-2.xml', SINGLE_BLOB)
 				AS myxml
 			);
 
@@ -471,3 +471,4 @@ INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
 		ON T.X.value('@Usuario', 'varchar(40)') = U.[User]
 	INNER JOIN dbo.CuentaAhorro C 
 		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
+

@@ -28,27 +28,26 @@ BEGIN
 			ON CA.TipoCuentaId = TCA.Id
 		WHERE CO.Id = @InIdCO
 
-		IF(@SaldoCO > 0)
-			EXEC dbo.MovimientoInteresCO @InIdCO
-										,@InFechaActual
-										,1
-										,'Interes Mensual'
+		EXEC dbo.MovimientoInteresCO @InIdCO
+									,@InFechaActual
+									,1
+									,'Interes Mensual'
 
-		IF((@SaldoCA - @MontoAhorro) >= 0)
-		BEGIN
-			EXEC dbo.InsertarMov @InFechaActual
-								,'Ahorro Cuenta Objetivo'
-								,@IdMonedaCA
-								,@MontoAhorro
-								,@NumCA
-								,14
+		IF((@SaldoCA - @MontoAhorro) < 0)
+			SET @MontoAhorro = 0
 
-			EXEC dbo.MovimientoCO @InIdCO
-								,@InFechaActual
-								,'Ahorro Mensual'
-								,1
-								,@MontoAhorro
-		END
+		EXEC dbo.InsertarMov @InFechaActual
+							,'Ahorro Cuenta Objetivo'
+							,@IdMonedaCA
+							,@MontoAhorro
+							,@NumCA
+							,14
+
+		EXEC dbo.MovimientoCO @InIdCO
+							,@InFechaActual
+							,'Ahorro Mensual'
+							,1
+							,@MontoAhorro
 
 	END TRY
 	BEGIN CATCH
