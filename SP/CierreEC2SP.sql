@@ -25,6 +25,7 @@ BEGIN
 				,@NumeroCuenta INT
 				,@Exceso INT
 				,@SaldoCuenta MONEY
+				,@Salida INT
 
 		-- Seleccion de variables --
 		SELECT @IdEstadoCuenta = EC.Id
@@ -54,6 +55,7 @@ BEGIN
 			,@MontoMovimiento
 			,@NumeroCuenta
 			,13
+			,@Salida
 
 		--Cobro mensual cargo por servicio
 		SELECT @MontoMovimiento = CargoServicios
@@ -64,6 +66,7 @@ BEGIN
 			,@MontoMovimiento
 			,@NumeroCuenta
 			,12
+			,@Salida
 
 		--Para comision por Operaciones en Retiros automaticos
 		IF (@OpATMCuenta > @OpATMTC)
@@ -77,6 +80,7 @@ BEGIN
 				,@MontoMovimiento
 				,@NumeroCuenta
 				,10
+				,@Salida
 		END
 
 		--Para comision por Operaciones en Retiros automaticos
@@ -91,6 +95,7 @@ BEGIN
 				,@MontoMovimiento
 				,@NumeroCuenta
 				,9
+				,@Salida
 		END
 
 		--Para Multa por saldo minimo
@@ -104,6 +109,7 @@ BEGIN
 				,@MontoMovimiento
 				,@NumeroCuenta
 				,17
+				,@Salida
 		END
 
 		SET TRANSACTION ISOLATION LEVEL READ COMMITTED

@@ -188,6 +188,7 @@ DECLARE @FechaActual DATE
 		,@IdCierreCOActual INT
 		,@IdCierreCOFinal INT
 		,@IdCOCerrar INT
+		,@Salida INT 
 
 -- Extraccion del xml a las tablas
 INSERT INTO @Fechas(Fecha)
@@ -371,6 +372,7 @@ BEGIN
 						,@MovMonto
 						,@MovNumeroCuenta
 						,@MovTipo 
+						,@Salida
 
 		SET @IdMovActual = @IdMovActual + 1
 	END
@@ -394,7 +396,7 @@ BEGIN
 		FROM @AhorroCO CO
 		WHERE CO.Id = @IdAhorroActual
 
-		EXEC dbo.AhorroCO @IdCOAhorro, @FechaActual
+		EXEC dbo.AhorroCO @IdCOAhorro, @FechaActual, @Salida
 
 		SET @IdAhorroActual = @IdAhorroActual + 1
 	END
@@ -417,7 +419,7 @@ BEGIN
 		FROM @CierreCO CO
 		WHERE CO.Id = @IdCierreCOActual
 
-		EXEC dbo.CierreCO @IdCOAhorro, @FechaActual
+		EXEC dbo.CierreCO @IdCOAhorro, @FechaActual, @Salida
 
 		SET @IdCierreCOActual = @IdCierreCOActual + 1
 	END
@@ -440,7 +442,7 @@ BEGIN
 		FROM @CierreCuentas CC
 		WHERE CC.Id = @IdCCActual
 
-		EXEC dbo.CerrarEC @CCIdCuenta, @FechaActual
+		EXEC dbo.CerrarEC @CCIdCuenta, @FechaActual, @Salida
 
 		SET @IdCCActual = @IdCCActual + 1
 	END
@@ -472,3 +474,5 @@ INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
 	INNER JOIN dbo.CuentaAhorro C 
 		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
 
+
+SELECT * FROM dbo.Movimiento WHERE IdTipoMov = 14 AND monto = 0 
