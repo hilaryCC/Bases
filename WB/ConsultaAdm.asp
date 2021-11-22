@@ -67,5 +67,42 @@
     </body>
     <div style="padding-left:16px">
         <br><br><label class='titulo'>Consulta # 1</label>
+        <br><br>
+        <table>
+            <tr bgcolor="grey" width="700">
+                <th>Numero Cuenta</th>
+                <th>Id CO</th>
+                <th>Descripcion</th>
+                <th>Cant retiros real</th>
+                <th>Cant retiros no real</th>
+                <th>Suma monto debitado real</th>
+                <th>Suma monto debitado no real</th>
+            </tr>
+            <%
+            Dim con 
+            Dim rec
+            ' Se crea el objeto de conexion
+            Set con = Server.CreateObject("Adodb.Connection")
+
+            ' Se crea el objeto recordset
+            Set rec = Server.CreateObject("Adodb.recordset")
+
+            ' Se abre la conexion
+            con.open "Proyecto1" ' nombre del DSN creado
+
+            ' Determinar cantidad de filas
+            Set cmd = Server.CreateObject("ADODB.command")
+            cmd.ActiveConnection = con
+            cmd.CommandType = 4
+            cmd.CommandText = "ConsultaFilasCO"
+            cmd.Parameters.Append cmd.CreateParameter ("@inId", 3, 1, 4, Session("IdCuenta"))
+            cmd.Parameters.Append cmd.CreateParameter ("@outCantFilas", 3, 2)
+            cmd.Execute
+            Session("CantFilasCO2") = CInt(cmd.Parameters("@outCantFilas"))
+            IF Session("CantFilasCO2") > 0 THEN
+
+            END IF
+            %>
+        </table>
     </div>
 </html>
