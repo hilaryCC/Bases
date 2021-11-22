@@ -1,4 +1,4 @@
-CREATE PROCEDURE ConsultaFilasCO
+CREATE PROCEDURE dbo.ConsultaFilasCO
 	@inId INT
 	, @outCantFilas INT OUTPUT
 AS 

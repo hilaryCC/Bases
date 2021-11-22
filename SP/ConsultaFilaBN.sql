@@ -13,7 +13,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultaFilaBN
+CREATE PROCEDURE dbo.ConsultaFilaBN
 	@inIdCuenta INT
 	, @inIdPersona INT
 	, @outIdBN INT OUTPUT

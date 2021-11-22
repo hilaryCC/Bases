@@ -1,6 +1,6 @@
 USE Proyecto
 GO
-CREATE PROCEDURE ValidarEC
+CREATE PROCEDURE dbo.ValidarEC
 	@inId INT
 	, @inIdCuenta INT
 	, @outCodeResult INT OUTPUT

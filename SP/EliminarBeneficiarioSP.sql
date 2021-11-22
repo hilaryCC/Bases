@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE EliminarBeneficiario
+CREATE PROCEDURE dbo.EliminarBeneficiario
 	@inIdBen INT
 	, @inIdUsuario INT 
 	, @outCodeResult INT OUTPUT

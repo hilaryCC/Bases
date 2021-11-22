@@ -1,4 +1,4 @@
-CREATE PROCEDURE ValidarCO
+CREATE PROCEDURE dbo.ValidarCO
 	@inId INT
 	, @outCodeResult INT OUTPUT
 	, @outEncontrado INT OUTPUT

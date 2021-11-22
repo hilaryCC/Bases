@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE EditTelefono2
+CREATE PROCEDURE dbo.EditTelefono2
 	@inNuevoTelefono2 INT
 	, @inIdBen INT
 	, @inIdUsuario INT

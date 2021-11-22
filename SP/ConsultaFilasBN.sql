@@ -6,7 +6,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultarFilasBN
+CREATE PROCEDURE dbo.ConsultarFilasBN
 	@inId INT
 	, @outCantFilas INT OUTPUT
 AS 

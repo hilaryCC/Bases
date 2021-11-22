@@ -1,7 +1,7 @@
-CREATE PROCEDURE dbo.EditObjetivoCO
-	@inObjetivo VARCHAR(40)
+CREATE PROCEDURE dbo.EditCuotaCO
+	@inCuota VARCHAR(40)
 	, @inIdCO INT
-	, @inIdUsuario INT 
+	, @inIdUsuario INT
 	, @outCodeResult INT OUTPUT
 AS
 BEGIN
@@ -36,11 +36,11 @@ BEGIN
 		WHERE CO.Id = @inIdCO
 
 		SET @XMLActual = (SELECT * FROM @Temp AS CuentaCO FOR XML AUTO)
-		UPDATE @Temp SET Objetivo = @inObjetivo
+		UPDATE @Temp SET Cuota = @inCuota
 		SET @XMLNuevo = (SELECT * FROM @Temp AS CuentaCO FOR XML AUTO)
 
 		BEGIN TRANSACTION T1
-			UPDATE CuentaObjetivo SET Objetivo=@inObjetivo
+			UPDATE CuentaObjetivo SET Cuota=@inCuota 
 			WHERE Id=@inIdCO;
 
 			INSERT INTO dbo.Eventos(IdTipoEvento,IdUser,[IP], Fecha, XMLAntes, XMLDespues)

@@ -2,7 +2,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ValidarBeneficiario
+CREATE PROCEDURE dbo.ValidarBeneficiario
 	@inIdBeneficiario INT
 	, @inIdCuenta INT
 	, @outCodeResult INT OUTPUT

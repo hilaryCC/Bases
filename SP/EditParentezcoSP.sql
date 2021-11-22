@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE EditParentezco
+CREATE PROCEDURE dbo.EditParentezco
 	@inNuevoParentezco VARCHAR(40)
 	, @inIdBen INT
 	, @inIdUsuario INT 

@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultarFilasEC
+CREATE PROCEDURE dbo.ConsultarFilasEC
 	@inId INT
 	, @outCantFilas INT OUTPUT
 AS 

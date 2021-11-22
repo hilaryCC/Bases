@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE EditNombre
+CREATE PROCEDURE dbo.EditNombre
 	@inNuevoNombre VARCHAR(40)
 	, @inIdBen INT
 	, @inIdUsuario INT 

@@ -1,6 +1,6 @@
 USE Proyecto
 GO
-CREATE PROCEDURE ConsultaFilaEC2
+CREATE PROCEDURE dbo.ConsultaFilaEC2
 	@inId INT
 	, @outFechaI VARCHAR(40) OUTPUT
 	, @outFechaF VARCHAR(40) OUTPUT

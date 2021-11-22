@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE InsPersona
+CREATE PROCEDURE dbo.InsPersona
 	@inTipoD INT
 	, @inNombre VARCHAR(40)
 	, @inIdent INT

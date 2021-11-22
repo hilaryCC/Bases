@@ -3,7 +3,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultaBeneficarios
+CREATE PROCEDURE dbo.ConsultaBeneficarios
 	@inIdCuenta INT
     , @outSuma INT OUTPUT
 	, @outCant INT OUTPUT

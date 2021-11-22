@@ -2,7 +2,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultaFilaCA2
+CREATE PROCEDURE dbo.ConsultaFilaCA2
 	@inCont INT
 	, @inIdPersona INT
 	, @outNombre VARCHAR(40) OUTPUT

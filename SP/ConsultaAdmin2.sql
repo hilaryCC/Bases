@@ -1,6 +1,6 @@
 USE Proyecto
 GO
-CREATE PROCEDURE ConsultaAdmin2
+CREATE PROCEDURE dbo.ConsultaAdmin2
 	@inIdCuenta INT,
 	@inDias INT,
 	@outInfo INT OUTPUT,

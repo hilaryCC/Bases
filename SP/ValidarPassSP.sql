@@ -7,7 +7,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ValidarPass
+CREATE PROCEDURE dbo.ValidarPass
 	@inNameUser VARCHAR(40)
 	, @inContrasena VARCHAR(40)
 	, @outCodeResult INT OUTPUT

@@ -1,11 +1,9 @@
-CREATE PROCEDURE InsCuentaObjetivo
+CREATE PROCEDURE dbo.InsCuentaObjetivo
 	@inIdCuenta INT
 	, @inFechaInicio VARCHAR(40)
 	, @inFechaFinal VARCHAR(40)
 	, @inCuota INT
 	, @inObjetivo VARCHAR(40)
-	, @inSaldo INT
-	, @inInteresAcumulado INT
 	, @inDiaAhorro INT 
 	, @inIdUsuario INT 
 	, @outCodeResult INT OUTPUT
@@ -39,10 +37,18 @@ BEGIN
 		SET @XMLNuevo = (SELECT * FROM @Temp AS CuentaCO FOR XML AUTO)
 
 		BEGIN TRANSACTION T1
-			INSERT INTO CuentaObjetivo(IdCuenta, FechaInicio, FechaFinal, DiaAhorro, Cuota, 
-										Objetivo, Saldo, InteresAcumulado, Activo)
-			VALUES (@inIdCuenta, @inFechaInicio, @inFechaFinal, @inDiaAhorro,
-					@inCuota, @inObjetivo, @inSaldo, @inInteresAcumulado, 1);
+			INSERT INTO dbo.CuentaObjetivo(IdCuenta, Cuota, FechaInicio, FechaFinal, 
+					DiaAhorro, Objetivo, Saldo, IdTasaInteres, InteresAcumulado, Activo)
+			VALUES (@inIdCuenta
+					, @inCuota
+					, @inFechaInicio
+					, @inFechaFinal
+					, @inDiaAhorro
+					, @inObjetivo
+					, 0
+					, DATEDIFF(MONTH, @inFechaInicio, @inFechaFinal)
+					, 0
+					, 1);
 
 			INSERT INTO dbo.Eventos(IdTipoEvento,IdUser,[IP], Fecha, XMLAntes, XMLDespues)
 			VALUES(4, @InIdUsuario, 0, GETDATE(), @XMLActual, @XMLNuevo)
@@ -64,3 +70,4 @@ BEGIN
 	END CATCH
 	SET NOCOUNT OFF
 END
+
