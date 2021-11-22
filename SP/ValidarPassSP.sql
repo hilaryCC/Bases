@@ -42,6 +42,13 @@ BEGIN
 			ROLLBACK TRAN T1;
 		--INSERT EN TABLA DE ERRORES;
 		SET @outCodeResult=50005;
+		SELECT
+			ERROR_NUMBER() AS ErrorNumber,
+			ERROR_STATE() AS ErrorState,
+			ERROR_SEVERITY() AS ErrorSeverity,
+			ERROR_PROCEDURE() AS ErrorProcedure,
+			ERROR_LINE() AS ErrorLine,
+			ERROR_MESSAGE() AS ErrorMessage;
 	END CATCH
 	SET NOCOUNT OFF
 END

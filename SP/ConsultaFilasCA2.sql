@@ -3,7 +3,7 @@
 --	+ Id de la cuenta
 -- Salida:
 --	+ Cantidad de filas
-USE Proyecto1
+USE Proyecto
 GO
 
 CREATE PROCEDURE ConsultarFilasCuentaAhorro2

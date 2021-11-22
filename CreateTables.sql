@@ -266,8 +266,8 @@ CREATE TABLE Eventos(
 	[IdUser] [int],
 	[IP][int],
 	[Fecha][date],
-	[XMLAntes][varchar](60),
-	[XMLDespues][varchar](60)
+	[XMLAntes][xml],
+	[XMLDespues][xml]
 	FOREIGN KEY (IdTipoEvento) REFERENCES TipoEvento(Id),
 	FOREIGN KEY (IdUser) REFERENCES Usuario(Id)
 )

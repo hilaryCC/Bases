@@ -1,4 +1,4 @@
-USE Proyecto1
+USE Proyecto
 GO
 CREATE PROCEDURE ConsultaFilaCEC
 	@inCont INT
@@ -33,11 +33,16 @@ BEGIN
 	OFFSET @inCont ROWS
 	FETCH NEXT 1 ROW ONLY;
 
-	-- Obtener el tipo de cambio	-- Obtener el Id de la moneda de la cuenta	SELECT @IdMonedaCA = IdTipoMoneda 
+	-- Obtener el tipo de cambio
+
+	-- Obtener el Id de la moneda de la cuenta
+	SELECT @IdMonedaCA = IdTipoMoneda 
 	FROM dbo.TipoCuentaAhorro TCA 
 	WHERE TCA.Id = (SELECT TipoCuentaId 
 					FROM dbo.CuentaAhorro C 
-					WHERE C.Id = @IdCuenta)	-- Determinar si hay que mostrar el tipo de cambio
+					WHERE C.Id = @IdCuenta)
+
+	-- Determinar si hay que mostrar el tipo de cambio
 	IF @IdMonedaMov != @IdMonedaCA
 	BEGIN
 		-- Movimiento en colones, cuenta en dolares

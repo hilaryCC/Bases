@@ -1,6 +1,6 @@
 -- SP para obtener la suma de los porcentajes y
 -- la cantidad de beneficiarios
-USE Proyecto1
+USE Proyecto
 GO
 
 CREATE PROCEDURE ConsultaBeneficarios

@@ -1,5 +1,5 @@
 -- Consulta una fila de la tabla Cuenta Ahorro
-USE Proyecto1
+USE Proyecto
 GO
 
 CREATE PROCEDURE ConsultaFilaCA

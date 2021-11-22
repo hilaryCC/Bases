@@ -6,6 +6,7 @@ GO
 CREATE PROCEDURE dbo.CerrarEC
 				@InIdCuenta INT
 				,@InFechaActual DATE
+				,@outCodeResult INT OUTPUT
 AS 
 BEGIN
 	SET NOCOUNT ON
@@ -122,11 +123,20 @@ BEGIN
 				SELECT DATEADD(DAY, 1, @InFechaActual), NULL, C.Saldo, NULL, C.Id, 0, 0, 1, C.Saldo 
 					FROM dbo.CuentaAhorro C WHERE C.Id = @InIdCuenta
 		COMMIT TRANSACTION T1;
+		SET @outCodeResult = 0;
 	END TRY
 
 	BEGIN CATCH
 		IF @@tRANCOUNT>0
 			ROLLBACK TRAN T1;
+		SET @outCodeResult = 50005;
+		SELECT
+			ERROR_NUMBER() AS ErrorNumber,
+			ERROR_STATE() AS ErrorState,
+			ERROR_SEVERITY() AS ErrorSeverity,
+			ERROR_PROCEDURE() AS ErrorProcedure,
+			ERROR_LINE() AS ErrorLine,
+			ERROR_MESSAGE() AS ErrorMessage;
 	END CATCH
 	SET NOCOUNT OFF
 END

@@ -8,6 +8,7 @@ CREATE PROCEDURE dbo.MovimientoInteresCO
 				,@InFechaActual DATE
 				,@InTipoMov INT
 				,@InDescripcion VARCHAR(50)
+				,@outCodeResult INT OUTPUT
 
 AS 
 BEGIN
@@ -42,11 +43,20 @@ BEGIN
 			UPDATE dbo.CuentaObjetivo SET InteresAcumulado = @NuevoInteresAcumulado
 			WHERE Id = @InIdCO
 		COMMIT TRANSACTION T1;
+		SET @outCodeResult = 0;
 	END TRY
 
 	BEGIN CATCH
 		IF @@tRANCOUNT>0
 			ROLLBACK TRAN T1;
+		SET @outCodeResult = 50005;
+		SELECT
+			ERROR_NUMBER() AS ErrorNumber,
+			ERROR_STATE() AS ErrorState,
+			ERROR_SEVERITY() AS ErrorSeverity,
+			ERROR_PROCEDURE() AS ErrorProcedure,
+			ERROR_LINE() AS ErrorLine,
+			ERROR_MESSAGE() AS ErrorMessage;
 	END CATCH
 	SET NOCOUNT OFF
 END

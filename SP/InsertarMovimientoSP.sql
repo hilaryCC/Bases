@@ -10,6 +10,7 @@ CREATE PROCEDURE dbo.InsertarMov
 				,@InMonto MONEY
 				,@InNumeroCuenta INT
 				,@InTipoMov INT
+				,@OutResultCode INT OUTPUT
 AS 
 BEGIN
 	SET NOCOUNT ON
@@ -22,7 +23,6 @@ BEGIN
 				,@SaldoActual MONEY
 				,@MonedaCuenta INT
 				,@MontoMismaMoneda MONEY 
-				,@OutResultCode INT 
 				,@SaldoMinimo MONEY
 				,@ValorCompra INT
 				,@ValorVenta INT
@@ -99,6 +99,13 @@ BEGIN
 		IF @@tRANCOUNT>0
 			ROLLBACK TRAN T1;
 		SET @OutResultCode = 50005;
+		SELECT
+			ERROR_NUMBER() AS ErrorNumber,
+			ERROR_STATE() AS ErrorState,
+			ERROR_SEVERITY() AS ErrorSeverity,
+			ERROR_PROCEDURE() AS ErrorProcedure,
+			ERROR_LINE() AS ErrorLine,
+			ERROR_MESSAGE() AS ErrorMessage;
 	END CATCH
 	SET NOCOUNT OFF
 END

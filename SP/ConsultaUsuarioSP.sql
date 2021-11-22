@@ -5,7 +5,7 @@
 --	+ Id del usuario
 --  + Id de la persona
 --  + Entero que indica si es administrador: 1(es) o 0 (no es)
-USE Proyecto1
+USE Proyecto
 GO
 
 CREATE PROCEDURE ConsultaUsuario

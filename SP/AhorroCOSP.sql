@@ -6,6 +6,7 @@ GO
 CREATE PROCEDURE dbo.AhorroCO
 				@InIdCO INT
 				,@InFechaActual DATE
+				,@outCodeResult INT OUTPUT
 AS 
 BEGIN
 	SET NOCOUNT ON
@@ -15,6 +16,7 @@ BEGIN
 				,@SaldoCA MONEY
 				,@IdMonedaCA INT 
 				,@SaldoCO MONEY
+				,@Salida INT 
 				
 		SELECT @MontoAhorro = CO.Cuota
 			   ,@SaldoCO = CO.Saldo
@@ -32,6 +34,7 @@ BEGIN
 									,@InFechaActual
 									,1
 									,'Interes Mensual'
+									,@Salida
 
 		IF((@SaldoCA - @MontoAhorro) < 0)
 			SET @MontoAhorro = 0
@@ -42,17 +45,28 @@ BEGIN
 							,@MontoAhorro
 							,@NumCA
 							,14
+							,@Salida
 
 		EXEC dbo.MovimientoCO @InIdCO
 							,@InFechaActual
 							,'Ahorro Mensual'
 							,1
 							,@MontoAhorro
+							,@Salida
 
+		SET @outCodeResult = 0;
 	END TRY
 	BEGIN CATCH
 		IF @@tRANCOUNT>0
 			ROLLBACK TRAN T1;
+		SET @outCodeResult = 50005;
+		SELECT
+			ERROR_NUMBER() AS ErrorNumber,
+			ERROR_STATE() AS ErrorState,
+			ERROR_SEVERITY() AS ErrorSeverity,
+			ERROR_PROCEDURE() AS ErrorProcedure,
+			ERROR_LINE() AS ErrorLine,
+			ERROR_MESSAGE() AS ErrorMessage;
 	END CATCH
 	SET NOCOUNT OFF
 END

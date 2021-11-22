@@ -6,6 +6,7 @@ GO
 CREATE PROCEDURE dbo.CierreCO
 				@InIdCO INT
 				,@InFechaActual DATE
+				,@outCodeResult INT OUTPUT
 AS 
 BEGIN
 	SET NOCOUNT ON
@@ -15,6 +16,7 @@ BEGIN
 				,@SaldoCA MONEY
 				,@IdMonedaCA INT 
 				,@TotalSaldoCO MONEY
+				,@Salida INT 
 				
 		SELECT @InteresAcumulado = CO.InteresAcumulado
 			   ,@TotalSaldoCO = CO.Saldo + CO.InteresAcumulado
@@ -32,18 +34,21 @@ BEGIN
 									,@InFechaActual
 									,2
 									,'Debito Interes Acumulados'
+									,@Salida
 
 		EXEC dbo.MovimientoCO @InIdCO
 							,@InFechaActual
 							,'Credito redencion Intereses'
 							,2
 							,@InteresAcumulado
+							,@Salida
 
 		EXEC dbo.MovimientoCO @InIdCO
 							,@InFechaActual
 							,'Debito Redencion Cuenta Objetivo'
 							,3
 							,@TotalSaldoCO
+							,@Salida
 
 		EXEC dbo.InsertarMov @InFechaActual
 							,'Credito Redencion Cuenta Objetivo'
@@ -51,17 +56,26 @@ BEGIN
 							,@TotalSaldoCO
 							,@NumCA
 							,15
+							,@Salida
 
 		SET TRANSACTION ISOLATION LEVEL READ COMMITTED
 		BEGIN TRANSACTION T1;
 			UPDATE dbo.CuentaObjetivo SET Activo = 0
 			WHERE Id = @InIdCO
 		COMMIT TRANSACTION T1;
-
+		SET @outCodeResult = 0;
 	END TRY
 	BEGIN CATCH
 		IF @@tRANCOUNT>0
 			ROLLBACK TRAN T1;
+		SET @outCodeResult = 50005;
+		SELECT
+			ERROR_NUMBER() AS ErrorNumber,
+			ERROR_STATE() AS ErrorState,
+			ERROR_SEVERITY() AS ErrorSeverity,
+			ERROR_PROCEDURE() AS ErrorProcedure,
+			ERROR_LINE() AS ErrorLine,
+			ERROR_MESSAGE() AS ErrorMessage;
 	END CATCH
 	SET NOCOUNT OFF
 END

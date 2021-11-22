@@ -1,4 +1,4 @@
-USE Proyecto1
+USE Proyecto
 GO
 CREATE PROCEDURE ConsultaFilaEC2
 	@inId INT
