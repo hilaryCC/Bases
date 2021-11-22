@@ -5,7 +5,7 @@ CREATE PROCEDURE InsCuentaObjetivo
 	, @inCuota INT
 	, @inObjetivo VARCHAR(40)
 	, @inSaldo INT
-	, @inInteresAnual INT
+	, @inInteresAcumulado INT
 	, @outCodeResult INT OUTPUT
 AS
 BEGIN
@@ -13,7 +13,7 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION T1
 			INSERT INTO CuentaObjetivo(IdCuenta, FechaInicio, FechaFinal, Cuota, Objetivo, Saldo, InteresAcumulado, Activo)
-			VALUES (@inIdCuenta, @inFechaInicio, @inFechaFinal, @inCuota, @inObjetivo, @inSaldo, @inInteresAnual, 1);
+			VALUES (@inIdCuenta, @inFechaInicio, @inFechaFinal, @inCuota, @inObjetivo, @inSaldo, @inInteresAcumulado, 1);
 		COMMIT TRANSACTION t1
 	END TRY
 	BEGIN CATCH
