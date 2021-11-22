@@ -94,13 +94,43 @@
             Set cmd = Server.CreateObject("ADODB.command")
             cmd.ActiveConnection = con
             cmd.CommandType = 4
-            cmd.CommandText = "ConsultaFilasCO"
+            cmd.CommandText = "ConsultarFilasAdmin"
             cmd.Parameters.Append cmd.CreateParameter ("@inId", 3, 1, 4, Session("IdCuenta"))
             cmd.Parameters.Append cmd.CreateParameter ("@outCantFilas", 3, 2)
             cmd.Execute
-            Session("CantFilasCO2") = CInt(cmd.Parameters("@outCantFilas"))
-            IF Session("CantFilasCO2") > 0 THEN
-
+            Session("CantFilasAdm") = CInt(cmd.Parameters("@outCantFilas"))
+            IF Session("CantFilasAdm") > 0 THEN
+                
+                FOR i = 0 to Session("CantFilasAdm")-1
+                    Set cmd2 = Server.CreateObject("ADODB.command")
+                    cmd2.ActiveConnection = con
+                    cmd2.CommandType = 4
+                    cmd2.CommandText = "ConsultaAdmin1"
+                    
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@inContador", 3, 1, 4, i)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outIdCo", 3, 2)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outNumeroCuenta", 3, 2)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outDescripcion", 200, 2, 40)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outCantRetReal", 3, 2)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outCantRetNoReal", 3, 2)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outMontoReal", 3, 2)
+                    cmd2.Parameters.Append cmd2.CreateParameter ("@outMontoNoReal", 3, 2)
+                    cmd2.Execute
+                    
+                    idCO = cmd2.Parameters("@outIdCo")
+                    
+                    IF IsNull(idCO) = False THEN
+                        Response.Write("<tr bgcolor='lightgrey' align='center'>")
+                        Response.Write("<td>" & cmd2.Parameters("@outNumeroCuenta") & "</td>")
+                        Response.Write("<td>" & idCO & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outDescripcion") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outCantRetReal") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outCantRetNoReal") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outMontoReal") & "</td>")
+                        Response.Write("<td>" & cmd2.Parameters("@outMontoNoReal") & "</td>")
+                        Response.Write("</tr>")
+                    END IF
+                NEXT
             END IF
             %>
         </table>
