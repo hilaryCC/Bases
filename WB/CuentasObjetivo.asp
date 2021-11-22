@@ -109,7 +109,7 @@
                   <th>Cuota</th>
                   <th>Objetivo</th>
                   <th>Saldo</th>
-                  <th>Interes Anual</th>
+                  <th>Interes Acumulado</th>
             </tr>
           <%
             'Crear objeto de conexion'
@@ -181,7 +181,7 @@
             <input class="textbox" type="text" id="Objetivo" name="Objetivo" required>
             
             <br><br>
-            <label for="InteresAnual">Interes Anual: </label>
+            <label for="InteresAnual">Interes Acumulado: </label>
             <input type="number" id="InteresAnual" name="InteresAnual" required>
              
             <br><br>
