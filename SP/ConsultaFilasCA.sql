@@ -5,7 +5,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultaFilasCuentaAhorro
+CREATE PROCEDURE dbo.ConsultaFilasCuentaAhorro
 	@outCantFilas INT OUTPUT
 AS 
 BEGIN

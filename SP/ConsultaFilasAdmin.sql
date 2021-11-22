@@ -1,7 +1,7 @@
-USE Proyecto1
+USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultarFilasAdmin
+CREATE PROCEDURE dbo.ConsultarFilasAdmin
 	@inId INT
 	, @outCantFilas INT OUTPUT
 AS 

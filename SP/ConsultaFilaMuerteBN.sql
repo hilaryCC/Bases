@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultaFilaMuerteBN
+CREATE PROCEDURE dbo.ConsultaFilaMuerteBN
 	@inId INT
 	, @outNombre VARCHAR(40) OUTPUT
 	, @outIdentificacion VARCHAR(40) OUTPUT

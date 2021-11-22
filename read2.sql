@@ -261,83 +261,85 @@ FROM @Fechas
 
 WHILE (@FechaActual <= @FechaFinal)
 BEGIN
+	SET TRANSACTION ISOLATION LEVEL READ COMMITTED
+	BEGIN TRANSACTION T1;
+		-- Se agrega el tipo de cambio --
+		INSERT INTO dbo.TipoCambio(IdMoneda1, IdMoneda2, ValorCompra, ValorVenta, Fecha)
+			SELECT 
+				2, 
+				1,
+				TC.Compra,
+				TC.Venta,
+				TC.Fecha
+			FROM @TipoCambio TC 
+			WHERE TC.Fecha = @FechaActual
 
-	-- Se agrega el tipo de cambio --
-	INSERT INTO dbo.TipoCambio(IdMoneda1, IdMoneda2, ValorCompra, ValorVenta, Fecha)
-		SELECT 
-			2, 
-			1,
-			TC.Compra,
-			TC.Venta,
-			TC.Fecha
-		FROM @TipoCambio TC 
-		WHERE TC.Fecha = @FechaActual
+		-- Se agregan las personas del dia --
+		INSERT INTO dbo.Persona(TipoDocuIdentidad, Nombre, ValorDocumentoIdentidad, FechaNacimiento,
+							Email, telefono1, telefono2)
+			SELECT
+				P.TDocu,
+				P.Nombre,
+				P.ValorDocu,
+				P.Nacimiento,
+				P.Email,
+				P.Tel1,
+				P.Tel2
+			FROM @Personas P
+			WHERE P.Fecha = @FechaActual
 
-	-- Se agregan las personas del dia --
-	INSERT INTO dbo.Persona(TipoDocuIdentidad, Nombre, ValorDocumentoIdentidad, FechaNacimiento,
-						Email, telefono1, telefono2)
-		SELECT
-			P.TDocu,
-			P.Nombre,
-			P.ValorDocu,
-			P.Nacimiento,
-			P.Email,
-			P.Tel1,
-			P.Tel2
-		FROM @Personas P
-		WHERE P.Fecha = @FechaActual
+		-- Se agregan las cuentas del dia --
+		INSERT INTO dbo.CuentaAhorro(IdPersona, TipoCuentaId, NumeroCuenta, FechaCreacion,Saldo)
+			SELECT 
+				P.Id,
+				C.TipoCuentaId,
+				C.NumeroCuenta,
+				C.FechaCreacion,
+				C.Saldo
+			FROM @Cuentas C
+			INNER JOIN dbo.Persona P 
+				ON C.DocuPersona = P.ValorDocumentoIdentidad
+			WHERE C.FechaCreacion = @FechaActual
 
-	-- Se agregan las cuentas del dia --
-	INSERT INTO dbo.CuentaAhorro(IdPersona, TipoCuentaId, NumeroCuenta, FechaCreacion,Saldo)
-		SELECT 
-			P.Id,
-			C.TipoCuentaId,
-			C.NumeroCuenta,
-			C.FechaCreacion,
-			C.Saldo
-		FROM @Cuentas C
-		INNER JOIN dbo.Persona P 
-			ON C.DocuPersona = P.ValorDocumentoIdentidad
-		WHERE C.FechaCreacion = @FechaActual
-
-	-- Cuentas Objetivo del dia --
-	INSERT INTO dbo.CuentaObjetivo(IdCuenta, NumeroCO, Cuota, FechaInicio, 
-							FechaFinal, DiaAhorro, Objetivo, Saldo, IdTasaInteres, InteresAcumulado, Activo)
-		SELECT 
-			CA.Id,
-			CO.NumCO,
-			CO.Monto,
-			CO.Inicio,
-			CO.Final,
-			CO.DiaAhorro,
-			CO.Objetivo,
-			0,
-			TI.Id,
-			0,
-			1
-		FROM @CuentasCO CO
-		INNER JOIN dbo.CuentaAhorro CA
-			ON CO.NumCA = CA.NumeroCuenta
-		INNER JOIN dbo.TasaInteres TI
-			ON TI.Id = DATEDIFF(MONTH, CO.Inicio, CO.Final)
-		WHERE CO.Inicio = @FechaActual
+		-- Cuentas Objetivo del dia --
+		INSERT INTO dbo.CuentaObjetivo(IdCuenta, NumeroCO, Cuota, FechaInicio, 
+								FechaFinal, DiaAhorro, Objetivo, Saldo, IdTasaInteres, InteresAcumulado, Activo)
+			SELECT 
+				CA.Id,
+				CO.NumCO,
+				CO.Monto,
+				CO.Inicio,
+				CO.Final,
+				CO.DiaAhorro,
+				CO.Objetivo,
+				0,
+				TI.Id,
+				0,
+				1
+			FROM @CuentasCO CO
+			INNER JOIN dbo.CuentaAhorro CA
+				ON CO.NumCA = CA.NumeroCuenta
+			INNER JOIN dbo.TasaInteres TI
+				ON TI.Id = DATEDIFF(MONTH, CO.Inicio, CO.Final)
+			WHERE CO.Inicio = @FechaActual
 
 
-	-- Se agregan los beneficiarios del dia -- 
-	INSERT INTO dbo.Beneficiario(IdCuenta, IdPersona, ParentezcoId, Porcentaje, Activo, FechaDesactivacion)
-		SELECT
-			C.Id,
-			P.Id,
-			B.Parentezco,
-			B.Porcentaje,
-			1,
-			NULL
-		FROM @Beneficiarios B
-		INNER JOIN dbo.CuentaAhorro C 
-			ON B.NumCuenta = C.NumeroCuenta
-		INNER JOIN dbo.Persona P
-			ON B.DocuPersona = P.ValorDocumentoIdentidad
-		WHERE B.Fecha = @FechaActual
+		-- Se agregan los beneficiarios del dia -- 
+		INSERT INTO dbo.Beneficiario(IdCuenta, IdPersona, ParentezcoId, Porcentaje, Activo, FechaDesactivacion)
+			SELECT
+				C.Id,
+				P.Id,
+				B.Parentezco,
+				B.Porcentaje,
+				1,
+				NULL
+			FROM @Beneficiarios B
+			INNER JOIN dbo.CuentaAhorro C 
+				ON B.NumCuenta = C.NumeroCuenta
+			INNER JOIN dbo.Persona P
+				ON B.DocuPersona = P.ValorDocumentoIdentidad
+			WHERE B.Fecha = @FechaActual
+		COMMIT TRANSACTION T1;
 
 	-- Movimientos del dia --
 	INSERT INTO @MovimientosDia(Fecha, Descripcion, IdMoneda, Monto, NumeroCuenta, Tipo)
@@ -352,17 +354,17 @@ BEGIN
 		WHERE M.Fecha = @FechaActual
 
 	SELECT @IdMovActual = MIN(Id)
-		   ,@IdMovFinal = MAX(Id) 
+			,@IdMovFinal = MAX(Id) 
 	FROM @MovimientosDia
 
 	WHILE(@IdMovActual <= @IdMovFinal)
 	BEGIN
 		SELECT @MovFecha = M.Fecha
-			   ,@MovDescripcion = M.Descripcion
-			   ,@MovIdMoneda = M.IdMoneda
-			   ,@MovMonto = M.Monto
-			   ,@MovNumeroCuenta = M.NumeroCuenta
-			   ,@MovTipo = M.Tipo
+				,@MovDescripcion = M.Descripcion
+				,@MovIdMoneda = M.IdMoneda
+				,@MovMonto = M.Monto
+				,@MovNumeroCuenta = M.NumeroCuenta
+				,@MovTipo = M.Tipo
 		FROM @MovimientosDia M
 		WHERE M.Id = @IdMovActual
 
@@ -387,7 +389,7 @@ BEGIN
 		AND CO.Activo = 1
 
 	SELECT @IdAhorroActual = MIN(Id)
-		   ,@IdAhorroFinal = MAX(Id)
+			,@IdAhorroFinal = MAX(Id)
 	FROM @AhorroCO
 
 	WHILE(@IdAhorroActual <= @IdAhorroFinal)
@@ -410,7 +412,7 @@ BEGIN
 		AND CO.Activo = 1
 
 	SELECT @IdCierreCOActual = MIN(Id)
-		   ,@IdCierreCOFinal = MAX(Id)
+			,@IdCierreCOFinal = MAX(Id)
 	FROM @CierreCO
 
 	WHILE(@IdCierreCOActual <= @IdCierreCOFinal)
@@ -433,7 +435,7 @@ BEGIN
 		AND (DAY(C.FechaCreacion) = DAY(@FechaActual))
 
 	SELECT @IdCCActual = MIN(Id)
-		   ,@IdCCFinal = MAX(Id)
+			,@IdCCFinal = MAX(Id)
 	FROM @CierreCuentas
 
 	WHILE(@IdCCActual <= @IdCCFinal)

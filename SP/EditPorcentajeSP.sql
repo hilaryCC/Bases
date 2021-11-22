@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE EditPorcentaje
+CREATE PROCEDURE dbo.EditPorcentaje
 	@inNuevoPorcentaje INT
 	, @inIdBen INT
 	, @inIdUsuario INT 

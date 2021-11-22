@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultaIdPersona
+CREATE PROCEDURE dbo.ConsultaIdPersona
 	@inUsuario VARCHAR(40)
 	, @outIdPersona INT OUTPUT
 AS 

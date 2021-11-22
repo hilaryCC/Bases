@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE EditIdentidad
+CREATE PROCEDURE dbo.EditIdentidad
 	@inNuevaIden INT
 	, @inIdBen INT
 	, @inIdUsuario INT 

@@ -8,7 +8,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultaUsuario
+CREATE PROCEDURE dbo.ConsultaUsuario
 	@inNameUser VARCHAR(40)
 	, @outIdUsuario INT OUTPUT
 	, @outIdPersona INT OUTPUT

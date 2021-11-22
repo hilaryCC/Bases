@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE InsBeneficiario2
+CREATE PROCEDURE dbo.InsBeneficiario2
 	@inIdCuenta INT
 	, @inIden INT
 	, @inParentezo VARCHAR(40)

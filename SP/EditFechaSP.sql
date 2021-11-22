@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE EditFecha
+CREATE PROCEDURE dbo.EditFecha
 	@inNuevaFecha VARCHAR(40)
 	, @inIdBen INT
 	, @inIdUsuario INT

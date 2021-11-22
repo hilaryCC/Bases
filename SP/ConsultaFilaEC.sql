@@ -1,6 +1,6 @@
 USE Proyecto
 GO
-CREATE PROCEDURE ConsultaFilaEC
+CREATE PROCEDURE dbo.ConsultaFilaEC
 	@inCont INT
 	, @inIdCuenta INT
 	, @outId INT OUTPUT

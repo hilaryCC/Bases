@@ -6,7 +6,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ValidarCuentaAhorro
+CREATE PROCEDURE dbo.ValidarCuentaAhorro
 	@inNumCuenta INT	
 	, @outExiste INT OUTPUT
 	, @outIdCuenta INT OUTPUT

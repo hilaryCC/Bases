@@ -1,7 +1,7 @@
-USE Proyecto1
+USE Proyecto
 GO
 
-CREATE PROCEDURE ConsultaAdmin1
+CREATE PROCEDURE dbo.ConsultaAdmin1
 	@inContador INT
 	, @outIdCo INT OUTPUT
 	, @outNumeroCuenta VARCHAR(40) OUTPUT
@@ -76,25 +76,3 @@ BEGIN
 
 	SET NOCOUNT OFF
 END
-
--- PRUEBA
-DECLARE @IdCO INT
-	, @Descripcion VARCHAR(40)
-	, @NumeroCuenta VARCHAR(40)
-	, @CantRetReal INT
-	, @CantRetNoReal INT
-	, @MontoReal INT
-	, @MontoNoReal INT;
-
-EXEC ConsultaAdmin1
-	@inContador = 0 
-	, @outIdCo = @IdCO OUTPUT
-	, @outNumeroCuenta = @NumeroCuenta OUTPUT
-	, @outDescripcion = @Descripcion OUTPUT
-	, @outCantRetReal = @CantRetReal OUTPUT
-	, @outCantRetNoReal = @CantRetNoReal OUTPUT
-	, @outMontoReal = @MontoReal OUTPUT
-	, @outMontoNoReal = @MontoNoReal OUTPUT
-
-SELECT @IdCO AS '@IdCO', @Descripcion AS '@Descripcion', @NumeroCuenta AS '@NumeroCuenta', 
-@CantRetReal AS '@CantRetReal', @CantRetNoReal AS '@CantRetNoReal', @MontoReal AS '@MontoReal', @MontoNoReal AS '@MontoNoReal';

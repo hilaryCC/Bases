@@ -1,7 +1,7 @@
 USE Proyecto
 GO
 
-CREATE PROCEDURE ValidarIdentificacion
+CREATE PROCEDURE dbo.ValidarIdentificacion
 	@inIdentificacion INT
 	, @outCodeResult INT OUTPUT
 	, @Encontrado INT OUTPUT
