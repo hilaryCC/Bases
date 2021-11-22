@@ -6,15 +6,51 @@ CREATE PROCEDURE InsBeneficiario
 	, @inIdPersona INT
 	, @inParentezo VARCHAR(40)
 	, @inPorcentaje INT
+	, @inIdUsuario INT
 	, @outCodeResult INT OUTPUT
 AS
 BEGIN
 	SET NOCOUNT ON
 	BEGIN TRY
+		DECLARE @Fecha DATE
+				,@XMLActual XML
+				,@XMLNuevo XML
+				,@Salida INT
+
+		DECLARE @Temp TABLE(
+			[NumC] [int],
+			[Parentezco] [int],
+			[Porcentaje] [int],
+			[Iden] [int]
+		);
+		INSERT INTO @Temp(NumC, Parentezco, Porcentaje, Iden)
+		SELECT C.NumeroCuenta
+				,Pa.Id
+				,@inPorcentaje
+				,P.ValorDocumentoIdentidad
+		FROM dbo.CuentaAhorro C
+		INNER JOIN dbo.Persona P
+			ON C.IdPersona = P.Id
+		INNER JOIN dbo.Parentezco Pa
+			ON Pa.Nombre = @inParentezo
+		WHERE C.Id = @inIdCuenta
+
+		SET @XMLActual = ''
+		SET @XMLNuevo = (SELECT NumC AS NumeroCuenta
+								,Parentezco AS ParentezcoId
+								,Porcentaje AS Porcentaje
+								,Iden AS ValorDocumentoIdentidadBeneficiario
+							FROM @Temp AS NuevoBeneficiario
+							FOR XML AUTO)
+
 		BEGIN TRANSACTION T1
 			INSERT INTO Beneficiario(IdCuenta, IdPersona, ParentezcoId, Porcentaje, Activo) 
 			VALUES (@inIdCuenta, @inIdPersona, (SELECT Id FROM Parentezco WHERE Nombre=@inParentezo), @inPorcentaje, 1);
+
+			INSERT INTO dbo.Eventos(IdTipoEvento,IdUser,[IP], Fecha, XMLAntes, XMLDespues)
+			VALUES(1, @InIdUsuario, 0, GETDATE(), @XMLActual, @XMLNuevo)
 		COMMIT TRANSACTION t1
+
 		SET @outCodeResult = 0;
 	END TRY
 	BEGIN CATCH

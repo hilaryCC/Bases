@@ -473,6 +473,3 @@ INSERT INTO dbo.Usuarios_Ver(IdUser, IdCuenta)
 		ON T.X.value('@Usuario', 'varchar(40)') = U.[User]
 	INNER JOIN dbo.CuentaAhorro C 
 		ON T.X.value('@NumeroCuenta', 'int') = C.NumeroCuenta
-
-
-SELECT * FROM dbo.Movimiento WHERE IdTipoMov = 14 AND monto = 0 
