@@ -19,7 +19,7 @@ BEGIN
 	     , @outSaldo = Saldo
 	     , @outInteres = InteresAcumulado
 	FROM CuentaObjetivo 
-	WHERE Activo = 1 AND Id = @inId
+	WHERE Id = @inId
 	AND IdCuenta = @inIdCuenta
 
 	SET NOCOUNT OFF

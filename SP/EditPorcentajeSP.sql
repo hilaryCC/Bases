@@ -4,15 +4,45 @@ GO
 CREATE PROCEDURE EditPorcentaje
 	@inNuevoPorcentaje INT
 	, @inIdBen INT
+	, @inIdUsuario INT 
 	, @outCodeResult INT OUTPUT
 AS
 BEGIN
 	SET NOCOUNT ON
 	BEGIN TRY
+		DECLARE @XMLNuevo XML
+				,@XMLActual XML
+
+		DECLARE @Temp TABLE(
+			[NumeroCuenta] [int],
+			[Parentezco] [int],
+			[Porcentaje] [int],
+			[ValorDocumentoIdentidadBeneficiario] [int]
+		);
+		INSERT INTO @Temp(NumeroCuenta, Parentezco, Porcentaje, ValorDocumentoIdentidadBeneficiario)
+		SELECT C.NumeroCuenta
+				,B.ParentezcoId
+				,B.Porcentaje
+				,P.ValorDocumentoIdentidad
+		FROM dbo.Beneficiario B
+		INNER JOIN dbo.CuentaAhorro C
+			ON C.Id = B.IdCuenta
+		INNER JOIN dbo.Persona P
+			ON P.Id = B.IdPersona
+		WHERE B.Id = @inIdBen
+
+
+		SET @XMLActual = (SELECT * FROM @Temp AS Beneficiario FOR XML AUTO)
+		UPDATE @Temp SET Porcentaje = @inNuevoPorcentaje
+		SET @XMLNuevo = (SELECT * FROM @Temp AS Beneficiario FOR XML AUTO)
+
 		BEGIN TRANSACTION T1
 			UPDATE Beneficiario 
 			SET Porcentaje=@inNuevoPorcentaje
-			WHERE Id=@inIdBen			
+			WHERE Id=@inIdBen	
+			
+			INSERT INTO dbo.Eventos(IdTipoEvento,IdUser,[IP], Fecha, XMLAntes, XMLDespues)
+			VALUES(2, @InIdUsuario, 0, GETDATE(), @XMLActual, @XMLNuevo)
 		COMMIT TRANSACTION t1
 		SET @outCodeResult = 0;
 	END TRY

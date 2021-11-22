@@ -12,10 +12,8 @@ AS
 BEGIN
 	SET NOCOUNT ON
 	BEGIN TRY
-		DECLARE @Fecha DATE
+		DECLARE @XMLNuevo XML
 				,@XMLActual XML
-				,@XMLNuevo XML
-				,@Salida INT
 
 		DECLARE @Temp TABLE(
 			[NumC] [int],
@@ -30,18 +28,19 @@ BEGIN
 				,P.ValorDocumentoIdentidad
 		FROM dbo.CuentaAhorro C
 		INNER JOIN dbo.Persona P
-			ON C.IdPersona = P.Id
+			ON P.Id = @inIdPersona
 		INNER JOIN dbo.Parentezco Pa
 			ON Pa.Nombre = @inParentezo
 		WHERE C.Id = @inIdCuenta
 
-		SET @XMLActual = ''
 		SET @XMLNuevo = (SELECT NumC AS NumeroCuenta
 								,Parentezco AS ParentezcoId
 								,Porcentaje AS Porcentaje
 								,Iden AS ValorDocumentoIdentidadBeneficiario
-							FROM @Temp AS NuevoBeneficiario
+							FROM @Temp AS Beneficiario
 							FOR XML AUTO)
+
+		SET @XMLActual = ''
 
 		BEGIN TRANSACTION T1
 			INSERT INTO Beneficiario(IdCuenta, IdPersona, ParentezcoId, Porcentaje, Activo) 
@@ -68,3 +67,5 @@ BEGIN
 	END CATCH
 	SET NOCOUNT OFF
 END
+
+

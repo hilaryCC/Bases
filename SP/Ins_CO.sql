@@ -6,14 +6,46 @@ CREATE PROCEDURE InsCuentaObjetivo
 	, @inObjetivo VARCHAR(40)
 	, @inSaldo INT
 	, @inInteresAcumulado INT
+	, @inDiaAhorro INT 
+	, @inIdUsuario INT 
 	, @outCodeResult INT OUTPUT
 AS
 BEGIN
 	SET NOCOUNT ON
 	BEGIN TRY
+		DECLARE @XMLActual XML
+				,@XMLNuevo XML
+
+		DECLARE @Temp TABLE(
+			[CuentaMaestra] [int],
+			[Objetivo] [varchar](50),
+			[DiaAhorro] [int],
+			[FechaInicio] [date],
+			[FechaFinal] [date],
+			[Cuota] [int]
+		);
+
+		INSERT INTO @Temp(CuentaMaestra, Objetivo, DiaAhorro, FechaInicio, FechaFinal, Cuota)
+		SELECT C.NumeroCuenta
+			   ,@inObjetivo
+			   ,@inDiaAhorro
+			   ,@inFechaInicio
+			   ,@inFechaFinal
+			   ,@inCuota
+		FROM dbo.CuentaAhorro C
+		WHERE C.Id = @inIdCuenta
+
+		SET @XMLActual = ''
+		SET @XMLNuevo = (SELECT * FROM @Temp AS CuentaCO FOR XML AUTO)
+
 		BEGIN TRANSACTION T1
-			INSERT INTO CuentaObjetivo(IdCuenta, FechaInicio, FechaFinal, Cuota, Objetivo, Saldo, InteresAcumulado, Activo)
-			VALUES (@inIdCuenta, @inFechaInicio, @inFechaFinal, @inCuota, @inObjetivo, @inSaldo, @inInteresAcumulado, 1);
+			INSERT INTO CuentaObjetivo(IdCuenta, FechaInicio, FechaFinal, DiaAhorro, Cuota, 
+										Objetivo, Saldo, InteresAcumulado, Activo)
+			VALUES (@inIdCuenta, @inFechaInicio, @inFechaFinal, @inDiaAhorro,
+					@inCuota, @inObjetivo, @inSaldo, @inInteresAcumulado, 1);
+
+			INSERT INTO dbo.Eventos(IdTipoEvento,IdUser,[IP], Fecha, XMLAntes, XMLDespues)
+			VALUES(4, @InIdUsuario, 0, GETDATE(), @XMLActual, @XMLNuevo)
 		COMMIT TRANSACTION t1
 		SET @outCodeResult = 0;
 	END TRY

@@ -4,14 +4,49 @@ GO
 CREATE PROCEDURE EditNombre
 	@inNuevoNombre VARCHAR(40)
 	, @inIdBen INT
+	, @inIdUsuario INT 
 	, @outCodeResult INT OUTPUT
 AS
 BEGIN
 	SET NOCOUNT ON
 	BEGIN TRY
+		DECLARE @XMLActual XML
+				,@XMLNuevo XML
+
+		DECLARE @Temp TABLE(
+			[Email] [varchar](40),
+			[FechaNacimiento] [date], 
+			[Nombre] [varchar](40),
+			[telefono1] [int],
+			[telefono2] [int],
+			[TipoDocuIdentidad] [int],
+			[ValorDocumentoIdentidad] [int]
+		);
+
+		INSERT INTO @Temp(Email, FechaNacimiento, Nombre, telefono1, 
+				telefono2, TipoDocuIdentidad, ValorDocumentoIdentidad)
+		SELECT P.Email
+			   ,P.FechaNacimiento
+			   ,P.Nombre
+			   ,P.telefono1
+			   ,P.telefono2
+			   ,P.TipoDocuIdentidad
+			   ,P.ValorDocumentoIdentidad
+		FROM dbo.Beneficiario B
+		INNER JOIN dbo.Persona P 
+			ON B.IdPersona = P.Id
+		WHERE B.Id = @inIdBen
+
+		SET @XMLActual = (SELECT * FROM @Temp AS Persona FOR XML AUTO)
+		UPDATE @Temp SET Nombre = @inNuevoNombre
+		SET @XMLNuevo = (SELECT * FROM @Temp AS Persona FOR XML AUTO)
+
 		BEGIN TRANSACTION T1
 			UPDATE Persona SET Nombre=@inNuevoNombre 
 			WHERE Id=(SELECT IdPersona FROM Beneficiario WHERE Id=@inIdBen)
+
+			INSERT INTO dbo.Eventos(IdTipoEvento,IdUser,[IP], Fecha, XMLAntes, XMLDespues)
+			VALUES(2, @InIdUsuario, 0, GETDATE(), @XMLActual, @XMLNuevo)
 		COMMIT TRANSACTION t1
 		SET @outCodeResult = 0;
 	END TRY
