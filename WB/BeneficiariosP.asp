@@ -112,7 +112,7 @@
             Set rec = Server.CreateObject("Adodb.recordset")
 
             ' Se abre la conexion
-            con.open "Proyecto1" ' nombre del DSN creado
+            con.open "BasesD" ' nombre del DSN creado
         %>
         <table>
           <tr bgcolor="grey" width="700">

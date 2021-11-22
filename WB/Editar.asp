@@ -14,7 +14,7 @@
     Set con = Server.CreateObject("Adodb.Connection")
 
     'Open the connection'
-    con.open "Proyecto1"
+    con.open "BasesD"
 
     'Collect data
     opcion=Request.Form("opcionB")
@@ -30,6 +30,7 @@
         cmd.CommandText = "EditNombre"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevoNombre", 200, 1, 40, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         cmd.Parameters.Delete 1
@@ -39,6 +40,7 @@
         cmd.CommandText = "EditIdentidad"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevaIden", 3, 1, 4, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         cmd.Parameters.Delete 1
@@ -48,6 +50,7 @@
         cmd.CommandText = "EditParentezco"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevoParentezco", 200, 1, 40, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         cmd.Parameters.Delete 1
@@ -58,6 +61,7 @@
         cmd.CommandText = "EditPorcentaje"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevoPorcentaje", 200, 1, 40, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         cmd.Parameters.Delete 1
@@ -73,6 +77,7 @@
         cmd.CommandText = "EditFecha"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevaFecha", 200, 1, 40, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         cmd.Parameters.Delete 1
@@ -82,6 +87,7 @@
         cmd.CommandText = "EditTelefono1"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevoTelefono1", 3, 1, 4, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         cmd.Parameters.Delete 1
@@ -91,6 +97,7 @@
         cmd.CommandText = "EditTelefono2"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevoTelefono2", 3, 1, 4, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idBen)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         cmd.Parameters.Delete 1

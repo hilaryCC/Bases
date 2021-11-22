@@ -119,7 +119,7 @@
                     
                         Session("nombreUsuario") = request.form("usuario")
                         Set con = Server.CreateObject("Adodb.Connection")
-                        con.open "Proyecto1"
+                        con.open "BasesD"
                         
                         ' Validar usuario
                         Set objCommand = Server.CreateObject("ADODB.command")

@@ -5,20 +5,20 @@
         Set con = Server.CreateObject("Adodb.Connection")
 
         'Abrir la conexion
-        con.open "Proyecto1"
+        con.open "BasesD"
 
         ' Obtener la informacion
         Dim fechaI
         Dim fechaF
         Dim cuota
         Dim objetivo
-        Dim interes
+        Dim ahorro
 
         fechaI = Request.Form("FechaInicio")
         fechaF = Request.Form("FechaFin")
         cuota = Request.Form("Cuota")
         objetivo = Request.Form("Objetivo")
-        interes = Request.Form("InteresAnual")
+        ahorro = Request.Form("DiaAhorro")
 
         ' Insertar Cuenta Objetivo
         Set cmd = Server.CreateObject("ADODB.command")
@@ -30,8 +30,8 @@
         cmd.Parameters.Append cmd.CreateParameter ("@inFechaFinal", 200, 1, 40, fechaF)
         cmd.Parameters.Append cmd.CreateParameter ("@inCuota", 3, 1, 4, cuota)
         cmd.Parameters.Append cmd.CreateParameter ("@inObjetivo", 200, 1, 40, objetivo)
-        cmd.Parameters.Append cmd.CreateParameter ("@inSaldo", 3, 1, 4, 0)
-        cmd.Parameters.Append cmd.CreateParameter ("@inInteresAnual", 3, 1, 4, interes)
+        cmd.Parameters.Append cmd.CreateParameter ("@inSaldo", 3, 1, 4, ahorro)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         Response.Redirect("CuentasObjetivo.asp")

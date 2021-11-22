@@ -15,7 +15,7 @@
 		    Set con = Server.CreateObject("Adodb.Connection")
 
 		    'Open the connection'
-		    con.open "Proyecto1"
+		    con.open "BasesD"
 
 		    nombre=Request.Form("nombre")
 			iden=Request.Form("ValorDocumentoIdentidad")
@@ -51,6 +51,7 @@
 			cmd2.Parameters.Append cmd2.CreateParameter ("@inIden", 3, 1, 4, iden)
 			cmd2.Parameters.Append cmd2.CreateParameter ("@inParentezo", 200, 1, 40, parentezco)  
 			cmd2.Parameters.Append cmd2.CreateParameter ("@inPorcentaje", 3, 1, 4, porcentaje)
+			cmd2.Parameters.Append cmd2.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
 			cmd2.Parameters.Append cmd2.CreateParameter ("@outCodeResult", 3, 2)
 			cmd2.Execute
 			Response.Redirect "BeneficiariosP.asp"

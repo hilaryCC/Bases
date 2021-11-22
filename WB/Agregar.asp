@@ -13,7 +13,7 @@
     Set con = Server.CreateObject("Adodb.Connection")
 
     'Open the connection'
-    con.open "Proyecto1"
+    con.open "BasesD"
 
     ' Se crea el objeto recordset
     Set rec = Server.CreateObject("Adodb.recordset")
@@ -44,6 +44,7 @@
         cmd2.Parameters.Append cmd2.CreateParameter ("@inIdPersona", 3, 1, 4, idP)
         cmd2.Parameters.Append cmd2.CreateParameter ("@inParentezo", 200, 1, 40, par)  
         cmd2.Parameters.Append cmd2.CreateParameter ("@inPorcentaje", 3, 1, 4, porcen)
+        cmd2.Parameters.Append cmd2.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd2.Parameters.Append cmd2.CreateParameter ("@outCodeResult", 3, 2)
         cmd2.Execute
         Response.Redirect("BeneficiariosP.asp")

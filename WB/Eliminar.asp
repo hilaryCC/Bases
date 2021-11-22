@@ -8,7 +8,7 @@
     Set con = Server.CreateObject("Adodb.Connection")
 
     'Open the connection'
-    con.open "Proyecto1"
+    con.open "BasesD"
 
     'Collect data'
     idB = CInt(Request.Form("eliminarB"))
@@ -17,6 +17,7 @@
     cmd.CommandType = 4
     cmd.CommandText = "EliminarBeneficiario"
     cmd.Parameters.Append cmd.CreateParameter ("@inIdBen", 3, 1, 4, idB)
+    cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
     cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
     cmd.Execute
     Response.redirect("BeneficiariosP.asp")

@@ -86,7 +86,7 @@
             Set rec = Server.CreateObject("Adodb.recordset")
 
             ' Se abre la conexion
-            con.open "Proyecto1" ' nombre del DSN creado
+            con.open "BasesD" ' nombre del DSN creado
 
             ' Determinar cantidad de filas
             Set cmd = Server.CreateObject("ADODB.command")

@@ -109,7 +109,7 @@
               Set con = Server.CreateObject("Adodb.Connection")
 
               'Open the connection
-              con.open "Proyecto1"
+              con.open "BasesD"
               
               ' Obtener la cantidad de filas 
               Set cmd = Server.CreateObject("ADODB.command")

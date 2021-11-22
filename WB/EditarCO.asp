@@ -10,7 +10,7 @@
     Set con = Server.CreateObject("Adodb.Connection")
 
     'Open the connection
-    con.open "Proyecto1"
+    con.open "BasesD"
 
     'Collect data
     opcion=Request.Form("opcionCO")
@@ -27,6 +27,7 @@
         cmd.CommandText = "EditFecha1CO"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevaFechaI", 200, 1, 40, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdCO", 3, 1, 4, idCO)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         Response.Redirect("CuentasObjetivo.asp")
@@ -34,6 +35,7 @@
         cmd.CommandText = "EditFecha2CO"
         cmd.Parameters.Append cmd.CreateParameter ("@inNuevaFechaF", 200, 1, 40, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdCO", 3, 1, 4, idCO)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         Response.Redirect("CuentasObjetivo.asp")
@@ -41,6 +43,23 @@
         cmd.CommandText = "EditObjetivoCO"
         cmd.Parameters.Append cmd.CreateParameter ("@inObjetivo", 200, 1, 40, nuevo)
         cmd.Parameters.Append cmd.CreateParameter ("@inIdCO", 3, 1, 4, idCO)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        Response.Redirect("CuentasObjetivo.asp")
+    ELSEIF (opcion="DiaAhorro") THEN
+        cmd.CommandText = "EditDiaAhorroCO"
+        cmd.Parameters.Append cmd.CreateParameter ("@inDia", 200, 1, 40, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdCO", 3, 1, 4, idCO)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
+        cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
+        cmd.Execute
+        Response.Redirect("CuentasObjetivo.asp")
+    ELSEIF (opcion="Cuota") THEN
+        cmd.CommandText = "EditCuotaCO"
+        cmd.Parameters.Append cmd.CreateParameter ("@inCuota", 200, 1, 40, nuevo)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdCO", 3, 1, 4, idCO)
+        cmd.Parameters.Append cmd.CreateParameter ("@inIdUsuario", 3, 1, 4, Session("IdUsuario"))
         cmd.Parameters.Append cmd.CreateParameter ("@outCodeResult", 3, 2)
         cmd.Execute
         Response.Redirect("CuentasObjetivo.asp")

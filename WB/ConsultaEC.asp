@@ -108,7 +108,7 @@
               Set con = Server.CreateObject("Adodb.Connection")
 
               'Open the connection
-              con.open "Proyecto1"
+              con.open "BasesD"
 
               Set cmd = Server.CreateObject("ADODB.command")
               cmd.ActiveConnection = con

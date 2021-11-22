@@ -94,7 +94,7 @@
                 Set rec = Server.CreateObject("Adodb.recordset")
 
                 ' Se abre la conexion
-                con.open "Proyecto1" ' nombre del DSN creado
+                con.open "BasesD" ' nombre del DSN creado
 
                 ' Mostrar todas las cuentas 
                 FOR i = 1 to Session("CantFilas1")

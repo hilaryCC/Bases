@@ -106,17 +106,18 @@
                   <th>Id</th>
                   <th>Fecha Inicio</th>
                   <th>Fecha Fin</th>
+                  <th>Dia Ahorro</th>
                   <th>Cuota</th>
                   <th>Objetivo</th>
                   <th>Saldo</th>
-                  <th>Interes Acumulado</th>
+                  <th>Interes Anual</th>
             </tr>
           <%
             'Crear objeto de conexion'
             Set con = Server.CreateObject("Adodb.Connection")
 
             'Open the connection'
-            con.open "Proyecto1"
+            con.open "BasesD"
 
             Set cmd = Server.CreateObject("ADODB.command")
             cmd.ActiveConnection = con
@@ -137,6 +138,7 @@
                   cmd2.Parameters.Append cmd2.CreateParameter ("@inIdCuenta", 3, 1, 4, Session("IdCuenta"))
                   cmd2.Parameters.Append cmd2.CreateParameter ("@outFechaI", 200, 2, 40)
                   cmd2.Parameters.Append cmd2.CreateParameter ("@outFechaF", 200, 2, 40)
+                  cmd2.Parameters.Append cmd2.CreateParameter ("@outDiaAhorro", 3, 2, 4)
                   cmd2.Parameters.Append cmd2.CreateParameter ("@outCuota", 3, 2, 4)
                   cmd2.Parameters.Append cmd2.CreateParameter ("@outObjetivo", 200, 2, 40)
                   cmd2.Parameters.Append cmd2.CreateParameter ("@outSaldo", 3, 2, 4)
@@ -148,6 +150,7 @@
                       Response.Write("<td>" & i & "</td>")
                       Response.Write("<td>" & fechaI & "</td>")
                       Response.Write("<td>" & cmd2.Parameters("@outFechaF") & "</td>")
+                      Response.Write("<td>" & cmd2.Parameters("@outDiaAhorro") & "</td>")
                       Response.Write("<td>" & cmd2.Parameters("@outCuota") & "</td>")
                       Response.Write("<td>" & cmd2.Parameters("@outObjetivo") & "</td>")
                       Response.Write("<td>" & cmd2.Parameters("@outSaldo") & "</td>")
@@ -171,6 +174,10 @@
             <br><br>
             <label for="optionlbl" >Fecha Fin:</label>
             <input type="date" id="FechaFin" name="FechaFin" placeholder="Fecha Fin">
+
+            <br><br>
+            <label for="optionlbl" >Dia Ahorro:</label>
+            <input type="number" id="DiaAhorro" name="DiaAhorro" required>
              
             <br><br>
             <label for="Cuota">Cuota: </label>
@@ -179,10 +186,6 @@
             <br><br>
             <label for="lbl2">Objetivo: </label>
             <input class="textbox" type="text" id="Objetivo" name="Objetivo" required>
-            
-            <br><br>
-            <label for="InteresAnual">Interes Acumulado: </label>
-            <input type="number" id="InteresAnual" name="InteresAnual" required>
              
             <br><br>
             <button id="aceptarAgregar" class="boton" type="submit">Aceptar</button>
@@ -204,6 +207,8 @@
                   <option value="fechaInicio">Fecha Inicio</option>
                   <option value="fechaFin">Fecha Fin</option>
                   <option value="objetivo">Objetivo</option>
+                  <option value="DiaAhorro">Dia Ahorro</option>
+                  <option value="Cuota">Cuota</option>
               </select>
 
               <br><br>
@@ -287,6 +292,7 @@
                   cmd6.CommandType = 4
                   cmd6.CommandText = "EliminarCO"
                   cmd6.Parameters.Append cmd6.CreateParameter ("@inId", 3, 1, 4, viene1)
+                  cmd6.Parameters.Append cmd6.CreateParameter ("@outCodeResult", 3, 1, 4, Session("IdUsuario"))
                   cmd6.Parameters.Append cmd6.CreateParameter ("@outCodeResult", 3, 2)
                   cmd6.Execute
                   Response.Redirect("CuentasObjetivo.asp")
