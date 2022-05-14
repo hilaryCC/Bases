@@ -1,0 +1,2 @@
+String para conectar mysql con sql server
+DRIVER=(MySQL ODBC 8.0 Unicode Driver); SERVER=localhost; PORT=3306; DATABASE=crmlinked; USER=crmuser; PASSWORD=crm_user_password; OPTION=3;
